@@ -1,7 +1,9 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +25,15 @@ import java.util.List;
  */
 public class GameState implements Comparable<GameState> {
 
+    private int playerNum;
+
+    private boolean buildPeasents;
+    private int requiredGold;
+    private int requiredWood;
+
+    private List<Position> goldLocations;
+    private List<Position> treeLocations;
+
     /**
      * Construct a GameState from a stateview object. This is used to construct the initial search node. All other
      * nodes should be constructed from the another constructor you create or by factory functions that you create.
@@ -34,7 +45,21 @@ public class GameState implements Comparable<GameState> {
      * @param buildPeasants True if the BuildPeasant action should be considered
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
-        // TODO: Implement me!
+        this.playerNum = playernum;
+        this.buildPeasents = buildPeasants;
+        this.requiredGold = requiredGold;
+        this.requiredWood = requiredWood;
+
+        goldLocations = new ArrayList<>();
+        treeLocations = new ArrayList<>();
+
+        for (ResourceNode.ResourceView resource : state.getAllResourceNodes()) {
+            if (resource.getType().equals(ResourceNode.Type.GOLD_MINE)) {
+                goldLocations.add(new Position(resource.getXPosition(), resource.getYPosition()));
+            } else if (resource.getType().equals(ResourceNode.Type.TREE)) {
+                treeLocations.add(new Position(resource.getXPosition(), resource.getYPosition()));
+            }
+        }
     }
 
     /**
@@ -120,5 +145,29 @@ public class GameState implements Comparable<GameState> {
     public int hashCode() {
         // TODO: Implement me!
         return 0;
+    }
+
+    public int getPlayerNum() {
+        return playerNum;
+    }
+
+    public boolean isBuildPeasents() {
+        return buildPeasents;
+    }
+
+    public int getRequiredGold() {
+        return requiredGold;
+    }
+
+    public int getRequiredWood() {
+        return requiredWood;
+    }
+
+    public List<Position> getGoldLocations() {
+        return goldLocations;
+    }
+
+    public List<Position> getTreeLocations() {
+        return treeLocations;
     }
 }
