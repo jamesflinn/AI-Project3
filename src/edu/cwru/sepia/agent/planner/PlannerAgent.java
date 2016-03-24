@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Created by Devin on 3/15/15.
+ * Created by  on 3/15/15.
  */
 public class PlannerAgent extends Agent {
 
@@ -91,7 +91,76 @@ public class PlannerAgent extends Agent {
      * @return The plan or null if no plan is found.
      */
     private Stack<StripsAction> AstarSearch(GameState startState) {
-        // TODO: Implement me!
+        System.out.println("Inside AStar");
+        List<MapLocation> closedSet = new ArrayList<MapLocation>();
+        List<MapLocation> openSet = new ArrayList<MapLocation>();
+
+        openSet.add(start);
+        List<MapLocation> exploredPrev = new ArrayList<MapLocation>();
+
+        HashMap<MapLocation, Double> fScore = new HashMap<MapLocation, Double>();
+        HashMap<MapLocation, MapLocation> explored = new HashMap<MapLocation, MapLocation>();
+        HashMap<MapLocation, Double> gScore = new HashMap<MapLocation, Double>();
+
+        MapLocation current = start;
+        fScore.put(current, calculateHeuristic(current, goal)); // initial estimate to goal
+        gScore.put(current, 0.0);                               // initial cost of optimal path
+
+        while (!openSet.isEmpty()) {
+            System.out.println("CURRENT NODE IS: " + current.toString());
+
+            MapLocation smallest = openSet.get(0);
+            //finding node with smallest fScore value
+            for (MapLocation loc : openSet) {
+                if (fScore.get(loc) < fScore.get(smallest)) {
+                    smallest = loc;
+                    System.out.println("NEW NODE IS: " + smallest.toString());
+                }
+            }
+            current = smallest;
+            //goal node is found, return path
+            if (current.equals(goal)) {
+                System.out.println(current.toString()+" GOAL FOUND!!!!!!!!!!!!!!!!!!!!");
+                return reconstructPath(explored, current);
+            }
+
+            //finished with the current node, so move it from Open to Closed
+            openSet.remove(current);
+            closedSet.add(current);
+
+            //examine the current nodes neighbors for the next most valid candidate
+            //examines all neighbor nodes that aren't closed or resources
+            List<MapLocation> neighbors = getNeighbors(current, xExtent, yExtent, resourceLocations, closedSet);
+
+            for (MapLocation neighbor : neighbors) {
+                if (gScore.get(neighbor) == null) {
+                    //gScore not found yet, initialize to VERY big
+                    gScore.put(neighbor, Double.MAX_VALUE);
+                }
+
+                //get distance between two nodes
+                double distance = Math.sqrt(Math.pow((neighbor.x - current.x), 2) + Math.pow((neighbor.y - current.y), 2));
+                double tentativeGScore = gScore.get(current) + distance;
+
+                //check if neighbor is in openSet
+                if (!openSet.contains(neighbor)) {
+                    System.out.println("Adding (" + neighbor.x + ", " + neighbor.y + ") to OpenSet");
+                    openSet.add(neighbor);
+                }
+                else if (tentativeGScore >= gScore.get(neighbor)) {
+                    continue;
+                }
+
+                exploredPrev.add(neighbor);
+                //use map instead of array to show explored from
+                explored.put(neighbor, current);
+                gScore.put(neighbor, tentativeGScore);
+                fScore.put(neighbor, (gScore.get(neighbor)+ calculateHeuristic(neighbor, goal)));
+            }
+        }
+        // return an empty path
+        System.out.println("Returning NOTHING");
+        return new Stack<MapLocation>();
         return null;
     }
 
