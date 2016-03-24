@@ -5,7 +5,7 @@ import edu.cwru.sepia.agent.planner.GameState;
 /**
  * Represents the HarvestWood action.
  */
-public class HarvestWoodAction implements StripsAction {
+public class HarvestAction implements StripsAction {
     @Override
     public boolean preconditionsMet(GameState state) {
         return false;
