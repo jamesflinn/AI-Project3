@@ -128,32 +128,39 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        // TODO: Implement me!
-        return 0;
+        if (this.getCost() > o.getCost()) {
+            return 1;
+        } else if (this.getCost() < o.getCost()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
-    /**
-     * This will be necessary to use the GameState as a key in a Set or Map.
-     *
-     * @param o The game state to compare
-     * @return True if this state equals the other state, false otherwise.
-     */
     @Override
     public boolean equals(Object o) {
-        // TODO: Implement me!
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GameState gameState = (GameState) o;
+
+        if (playerNum != gameState.playerNum) return false;
+        if (buildPeasants != gameState.buildPeasants) return false;
+        if (requiredGold != gameState.requiredGold) return false;
+        if (requiredWood != gameState.requiredWood) return false;
+        if (!goldLocations.equals(gameState.goldLocations)) return false;
+        return treeLocations.equals(gameState.treeLocations);
     }
 
-    /**
-     * This is necessary to use the GameState as a key in a HashSet or HashMap. Remember that if two objects are
-     * equal they should hash to the same value.
-     *
-     * @return An integer hashcode that is equal for equal states.
-     */
     @Override
     public int hashCode() {
-        // TODO: Implement me!
-        return 0;
+        int result = playerNum;
+        result = 31 * result + (buildPeasants ? 1 : 0);
+        result = 31 * result + requiredGold;
+        result = 31 * result + requiredWood;
+        result = 31 * result + goldLocations.hashCode();
+        result = 31 * result + treeLocations.hashCode();
+        return result;
     }
 
     public int getPlayerNum() {
