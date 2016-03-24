@@ -34,8 +34,8 @@ public class GameState implements Comparable<GameState> {
     private int currentGold;
     private int currentWood;
 
-    private List<Position> goldLocations;
-    private List<Position> treeLocations;
+    private List<ResourceLocation> goldLocations;
+    private List<ResourceLocation> treeLocations;
 
     private List<Peasant> peasants;
 
@@ -62,10 +62,11 @@ public class GameState implements Comparable<GameState> {
 
         // add resource locations
         for (ResourceNode.ResourceView resource : state.getAllResourceNodes()) {
+            Position position = new Position(resource.getXPosition(), resource.getYPosition());
             if (resource.getType().equals(ResourceNode.Type.GOLD_MINE)) {
-                goldLocations.add(new Position(resource.getXPosition(), resource.getYPosition()));
+                goldLocations.add(new ResourceLocation(position, resource.getAmountRemaining()));
             } else if (resource.getType().equals(ResourceNode.Type.TREE)) {
-                treeLocations.add(new Position(resource.getXPosition(), resource.getYPosition()));
+                treeLocations.add(new ResourceLocation(position, resource.getAmountRemaining()));
             }
         }
 
@@ -201,11 +202,11 @@ public class GameState implements Comparable<GameState> {
         return requiredWood;
     }
 
-    public List<Position> getGoldLocations() {
+    public List<ResourceLocation> getGoldLocations() {
         return goldLocations;
     }
 
-    public List<Position> getTreeLocations() {
+    public List<ResourceLocation> getTreeLocations() {
         return treeLocations;
     }
 
