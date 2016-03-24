@@ -30,6 +30,8 @@ public class GameState implements Comparable<GameState> {
     private boolean buildPeasants;
     private int requiredGold;
     private int requiredWood;
+    private int currentGold;
+    private int currentWood;
 
     private List<Position> goldLocations;
     private List<Position> treeLocations;
@@ -49,7 +51,8 @@ public class GameState implements Comparable<GameState> {
         this.buildPeasants = buildPeasants;
         this.requiredGold = requiredGold;
         this.requiredWood = requiredWood;
-
+        currentGold = 0;
+        currentWood = 0;
         goldLocations = new ArrayList<>();
         treeLocations = new ArrayList<>();
 
@@ -61,6 +64,10 @@ public class GameState implements Comparable<GameState> {
             }
         }
     }
+    public GameState(GameState state , int currentGold, int currentWood ){
+        this.currentGold = currentGold;
+        this.currentWood = currentWood;
+    }
 
     /**
      * Unlike in the first A* assignment there are many possible goal states. As long as the wood and gold requirements
@@ -70,7 +77,9 @@ public class GameState implements Comparable<GameState> {
      * @return true if the goal conditions are met in this instance of game state.
      */
     public boolean isGoal() {
-
+        if(currentGold == requiredGold && currentWood == requiredWood){
+            return true;
+        }
         return false;
     }
 
