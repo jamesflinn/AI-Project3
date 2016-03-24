@@ -2,6 +2,7 @@ package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
+import edu.cwru.sepia.environment.model.state.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,8 @@ public class GameState implements Comparable<GameState> {
     private List<Position> goldLocations;
     private List<Position> treeLocations;
 
+    private List<Peasant> peasants;
+
     /**
      * Construct a GameState from a stateview object. This is used to construct the initial search node. All other
      * nodes should be constructed from the another constructor you create or by factory functions that you create.
@@ -55,7 +58,9 @@ public class GameState implements Comparable<GameState> {
         currentWood = 0;
         goldLocations = new ArrayList<>();
         treeLocations = new ArrayList<>();
+        peasants = new ArrayList<>();
 
+        // add resource locations
         for (ResourceNode.ResourceView resource : state.getAllResourceNodes()) {
             if (resource.getType().equals(ResourceNode.Type.GOLD_MINE)) {
                 goldLocations.add(new Position(resource.getXPosition(), resource.getYPosition()));
@@ -63,8 +68,28 @@ public class GameState implements Comparable<GameState> {
                 treeLocations.add(new Position(resource.getXPosition(), resource.getYPosition()));
             }
         }
+
+        // add existing units
+        for (Unit.UnitView unit : state.getUnits(playernum)) {
+            peasants.add(new Peasant(new Position(unit.getXPosition(), unit.getYPosition())));
+        }
     }
-    public GameState(GameState state , int currentGold, int currentWood ){
+
+    /**
+     * Construct a GameState from a previous GameState object.
+     * @param state The previous state
+     * @param currentGold The current gold
+     * @param currentWood The current wood
+     */
+    public GameState(GameState state , int currentGold, int currentWood) {
+        this.playerNum = state.getPlayerNum();
+        this.buildPeasants = state.isBuildPeasants();
+        this.requiredGold = state.getRequiredGold();
+        this.requiredWood = state.getRequiredWood();
+        this.goldLocations = state.getGoldLocations();
+        this.treeLocations = state.getTreeLocations();
+        this.peasants = state.getPeasants();
+
         this.currentGold = currentGold;
         this.currentWood = currentWood;
     }
@@ -77,10 +102,7 @@ public class GameState implements Comparable<GameState> {
      * @return true if the goal conditions are met in this instance of game state.
      */
     public boolean isGoal() {
-        if(currentGold == requiredGold && currentWood == requiredWood){
-            return true;
-        }
-        return false;
+        return currentGold >= requiredGold && currentWood >= requiredWood;
     }
 
     /**
@@ -185,5 +207,9 @@ public class GameState implements Comparable<GameState> {
 
     public List<Position> getTreeLocations() {
         return treeLocations;
+    }
+
+    public List<Peasant> getPeasants() {
+        return peasants;
     }
 }
