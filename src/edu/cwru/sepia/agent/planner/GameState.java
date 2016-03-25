@@ -3,6 +3,7 @@ package edu.cwru.sepia.agent.planner;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
+import javafx.geometry.Pos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class GameState implements Comparable<GameState> {
     private List<ResourceLocation> goldLocations;
     private List<ResourceLocation> treeLocations;
 
+    private Position townhall;
     private List<Peasant> peasants;
 
     /**
@@ -72,7 +74,13 @@ public class GameState implements Comparable<GameState> {
 
         // add existing units
         for (Unit.UnitView unit : state.getUnits(playernum)) {
-            peasants.add(new Peasant(new Position(unit.getXPosition(), unit.getYPosition())));
+            String unitType = unit.getTemplateView().getName().toLowerCase();
+
+            if (unitType.equals("townhall")) {
+                townhall = new Position(unit.getXPosition(), unit.getYPosition());
+            } else if (unitType.equals("peasant")) {
+                peasants.add(new Peasant(new Position(unit.getXPosition(), unit.getYPosition())));
+            }
         }
     }
 
@@ -87,6 +95,7 @@ public class GameState implements Comparable<GameState> {
         this.buildPeasants = state.isBuildPeasants();
         this.requiredGold = state.getRequiredGold();
         this.requiredWood = state.getRequiredWood();
+        this.townhall = state.getTownhall();
 
         this.goldLocations = goldLocations;
         this.treeLocations = treeLocations;
@@ -226,5 +235,9 @@ public class GameState implements Comparable<GameState> {
 
     public List<Peasant> getPeasants() {
         return peasants;
+    }
+
+    public Position getTownhall() {
+        return townhall;
     }
 }

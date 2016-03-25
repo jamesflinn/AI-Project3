@@ -51,6 +51,10 @@ public class Peasant {
         return position;
     }
 
+    public ResourceNode.Type getResourceType() {
+        return resourceType;
+    }
+
     public void setPosition(Position position) {
         this.position = position;
     }
