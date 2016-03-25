@@ -1,16 +1,27 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.environment.model.state.ResourceNode;
+
 /**
  * Holds information about a specific peasant.
  */
 public class Peasant {
 
-    private boolean isCarrying;
     private Position position;
+
+    private boolean isCarrying;
+    private ResourceNode.Type resourceType;
 
     public Peasant(Position position) {
         this.isCarrying = false;
         this.position = position;
+    }
+
+    public Peasant(Position position, ResourceNode.Type resourceType) {
+        this.position = position;
+
+        this.isCarrying = true;
+        this.resourceType = resourceType;
     }
 
     @Override

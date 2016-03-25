@@ -64,9 +64,9 @@ public class GameState implements Comparable<GameState> {
         for (ResourceNode.ResourceView resource : state.getAllResourceNodes()) {
             Position position = new Position(resource.getXPosition(), resource.getYPosition());
             if (resource.getType().equals(ResourceNode.Type.GOLD_MINE)) {
-                goldLocations.add(new ResourceLocation(position, resource.getAmountRemaining()));
+                goldLocations.add(new ResourceLocation(position, ResourceNode.Type.GOLD_MINE,resource.getAmountRemaining()));
             } else if (resource.getType().equals(ResourceNode.Type.TREE)) {
-                treeLocations.add(new ResourceLocation(position, resource.getAmountRemaining()));
+                treeLocations.add(new ResourceLocation(position, ResourceNode.Type.TREE,resource.getAmountRemaining()));
             }
         }
 
@@ -82,15 +82,15 @@ public class GameState implements Comparable<GameState> {
      * @param currentGold The current gold
      * @param currentWood The current wood
      */
-    public GameState(GameState state , int currentGold, int currentWood) {
+    public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, List<Peasant> peasants, int currentGold, int currentWood) {
         this.playerNum = state.getPlayerNum();
         this.buildPeasants = state.isBuildPeasants();
         this.requiredGold = state.getRequiredGold();
         this.requiredWood = state.getRequiredWood();
-        this.goldLocations = state.getGoldLocations();
-        this.treeLocations = state.getTreeLocations();
-        this.peasants = state.getPeasants();
 
+        this.goldLocations = goldLocations;
+        this.treeLocations = treeLocations;
+        this.peasants = state.getPeasants();
         this.currentGold = currentGold;
         this.currentWood = currentWood;
     }
@@ -194,6 +194,14 @@ public class GameState implements Comparable<GameState> {
         return buildPeasants;
     }
 
+    public int getCurrentGold() {
+        return currentGold;
+    }
+
+    public int getCurrentWood() {
+        return currentWood;
+    }
+
     public int getRequiredGold() {
         return requiredGold;
     }
@@ -208,6 +216,12 @@ public class GameState implements Comparable<GameState> {
 
     public List<ResourceLocation> getTreeLocations() {
         return treeLocations;
+    }
+
+    public List<ResourceLocation> getAllResourceLocations() {
+        List<ResourceLocation> allResources = new ArrayList<>(goldLocations);
+        allResources.addAll(treeLocations);
+        return allResources;
     }
 
     public List<Peasant> getPeasants() {

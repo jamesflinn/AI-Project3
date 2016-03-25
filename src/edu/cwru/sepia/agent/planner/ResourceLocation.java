@@ -8,10 +8,33 @@ import edu.cwru.sepia.environment.model.state.ResourceNode;
 public class ResourceLocation {
     private int amount;
     private Position position;
+    private ResourceNode.Type resourceType;
 
-    public ResourceLocation(Position position, int amount) {
+    public ResourceLocation(Position position, ResourceNode.Type resourceType, int amount) {
         this.position = position;
+        this.resourceType = resourceType;
         this.amount = amount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ResourceLocation that = (ResourceLocation) o;
+
+        if (amount != that.amount) return false;
+        if (!position.equals(that.position)) return false;
+        return resourceType == that.resourceType;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = amount;
+        result = 31 * result + position.hashCode();
+        result = 31 * result + (resourceType != null ? resourceType.hashCode() : 0);
+        return result;
     }
 
     public int getAmount() {
@@ -22,7 +45,7 @@ public class ResourceLocation {
         return position;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public ResourceNode.Type getResourceType() {
+        return resourceType;
     }
 }

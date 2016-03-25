@@ -1,18 +1,87 @@
 package edu.cwru.sepia.agent.planner.actions;
 
 import edu.cwru.sepia.agent.planner.GameState;
+import edu.cwru.sepia.agent.planner.Peasant;
+import edu.cwru.sepia.agent.planner.ResourceLocation;
+import edu.cwru.sepia.environment.model.state.ResourceNode;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents the HarvestWood action.
  */
 public class HarvestAction implements StripsAction {
+    /**
+     * Preconditions are met if the peasant is adjacent to a resource, if that resource has an amount > 0,
+     * and if the peasant is not already carrying anything.
+     * @param state GameState to check if action is applicable
+     * @return true if preconditions are met
+     */
     @Override
     public boolean preconditionsMet(GameState state) {
-        return false;
+        if (state.getPeasants().size() != 1) {
+            return false;
+        }
+
+        Peasant peasant = state.getPeasants().get(0);
+        ResourceLocation adjResource = findAdjResource(peasant, state.getGoldLocations(), state.getTreeLocations());
+        return adjResource != null && adjResource.getAmount() > 0 && !peasant.isCarrying();
     }
 
+    /**
+     * Creates a new GameState such that the peasant is now carrying resources,
+     * and the resource location now has 100 less resources
+     * @param state State to apply action to
+     * @return the new GameState
+     */
     @Override
     public GameState apply(GameState state) {
+        Peasant oldPeasant = state.getPeasants().get(0);
+        ResourceLocation adjResource = findAdjResource(oldPeasant, state.getGoldLocations(), state.getTreeLocations());
+
+        Peasant newPeasant = new Peasant(oldPeasant.getPosition(), adjResource.getResourceType());
+
+        List<ResourceLocation> newGoldLocations = new ArrayList<>(state.getGoldLocations());
+        List<ResourceLocation> newTreeLocations = new ArrayList<>(state.getTreeLocations());
+
+        if (adjResource.getResourceType() == ResourceNode.Type.GOLD_MINE) {
+            newGoldLocations.set(
+                    state.getGoldLocations().indexOf(adjResource),
+                    new ResourceLocation(adjResource.getPosition(), adjResource.getResourceType(), adjResource.getAmount() - 100)
+            );
+        } else {
+            newTreeLocations.set(
+                    state.getTreeLocations().indexOf(adjResource),
+                    new ResourceLocation(adjResource.getPosition(), adjResource.getResourceType(), adjResource.getAmount() - 100)
+            );
+
+        }
+
+        return new GameState(state, newGoldLocations, newTreeLocations, Arrays.asList(newPeasant), state.getCurrentGold(), state.getCurrentWood());
+    }
+
+    /**
+     * Finds the resource that is adjacent to the given peasant. Null if there is no such resource.
+     * @param peasant The specified peasant
+     * @param goldLocations The locations of gold mines
+     * @param treeLocations The locations of forests
+     * @return The adjacent resource, null if there is no such resource
+     */
+    private ResourceLocation findAdjResource(Peasant peasant, List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations) {
+        for (ResourceLocation gold : goldLocations) {
+            if (peasant.getPosition().isAdjacent(gold.getPosition())) {
+                return gold;
+            }
+        }
+
+        for (ResourceLocation tree : treeLocations) {
+            if (peasant.getPosition().isAdjacent(tree.getPosition())) {
+                return tree;
+            }
+        }
+        // no adjacent resource found
         return null;
     }
 }
