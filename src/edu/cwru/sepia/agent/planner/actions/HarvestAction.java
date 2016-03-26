@@ -5,14 +5,19 @@ import edu.cwru.sepia.agent.planner.Peasant;
 import edu.cwru.sepia.agent.planner.ResourceLocation;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents the HarvestWood action.
  */
 public class HarvestAction implements StripsAction {
+
+    private int peasantID;
+
+    public HarvestAction(int peasantID) {
+        this.peasantID = peasantID;
+    }
+
     /**
      * Preconditions are met if the peasant is adjacent to a resource, if that resource has an amount > 0,
      * and if the peasant is not already carrying anything.
@@ -21,11 +26,7 @@ public class HarvestAction implements StripsAction {
      */
     @Override
     public boolean preconditionsMet(GameState state) {
-        if (state.getPeasants().size() != 1) {
-            return false;
-        }
-
-        Peasant peasant = state.getPeasants().get(0);
+        Peasant peasant = state.getPeasant(peasantID);
         ResourceLocation adjResource = findAdjResource(peasant, state.getGoldLocations(), state.getTreeLocations());
         return adjResource != null && adjResource.getAmount() > 0 && !peasant.isCarrying();
     }
@@ -38,10 +39,10 @@ public class HarvestAction implements StripsAction {
      */
     @Override
     public GameState apply(GameState state) {
-        Peasant oldPeasant = state.getPeasants().get(0);
+        Peasant oldPeasant = state.getPeasant(peasantID);
         ResourceLocation adjResource = findAdjResource(oldPeasant, state.getGoldLocations(), state.getTreeLocations());
 
-        Peasant newPeasant = new Peasant(oldPeasant.getPosition(), adjResource.getResourceType());
+        Peasant newPeasant = new Peasant(peasantID, oldPeasant.getPosition(), adjResource.getResourceType());
 
         List<ResourceLocation> newGoldLocations = new ArrayList<>(state.getGoldLocations());
         List<ResourceLocation> newTreeLocations = new ArrayList<>(state.getTreeLocations());
@@ -59,7 +60,10 @@ public class HarvestAction implements StripsAction {
 
         }
 
-        return new GameState(state, newGoldLocations, newTreeLocations, Arrays.asList(newPeasant), state.getCurrentGold(), state.getCurrentWood());
+        Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
+        newPeasantMap.put(peasantID, newPeasant);
+
+        return new GameState(state, newGoldLocations, newTreeLocations, newPeasantMap, state.getCurrentGold(), state.getCurrentWood());
     }
 
     /**

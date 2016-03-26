@@ -6,7 +6,9 @@ import edu.cwru.sepia.environment.model.state.Unit;
 import javafx.geometry.Pos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to represent the state of the game after applying one of the avaiable actions. It will also
@@ -39,7 +41,7 @@ public class GameState implements Comparable<GameState> {
     private List<ResourceLocation> treeLocations;
 
     private Position townhall;
-    private List<Peasant> peasants;
+    private Map<Integer, Peasant> peasants;
 
     /**
      * Construct a GameState from a stateview object. This is used to construct the initial search node. All other
@@ -60,7 +62,7 @@ public class GameState implements Comparable<GameState> {
         currentWood = 0;
         goldLocations = new ArrayList<>();
         treeLocations = new ArrayList<>();
-        peasants = new ArrayList<>();
+        peasants = new HashMap<>();
 
         // add resource locations
         for (ResourceNode.ResourceView resource : state.getAllResourceNodes()) {
@@ -79,7 +81,7 @@ public class GameState implements Comparable<GameState> {
             if (unitType.equals("townhall")) {
                 townhall = new Position(unit.getXPosition(), unit.getYPosition());
             } else if (unitType.equals("peasant")) {
-                peasants.add(new Peasant(new Position(unit.getXPosition(), unit.getYPosition())));
+                peasants.put(unit.getID(), new Peasant(new Position(unit.getXPosition(), unit.getYPosition())));
             }
         }
     }
@@ -90,7 +92,7 @@ public class GameState implements Comparable<GameState> {
      * @param currentGold The current gold
      * @param currentWood The current wood
      */
-    public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, List<Peasant> peasants, int currentGold, int currentWood) {
+    public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, Map<Integer, Peasant> peasants, int currentGold, int currentWood) {
         this.playerNum = state.getPlayerNum();
         this.buildPeasants = state.isBuildPeasants();
         this.requiredGold = state.getRequiredGold();
@@ -99,7 +101,7 @@ public class GameState implements Comparable<GameState> {
 
         this.goldLocations = goldLocations;
         this.treeLocations = treeLocations;
-        this.peasants = state.getPeasants();
+        this.peasants = state.getPeasantsMap();
         this.currentGold = currentGold;
         this.currentWood = currentWood;
     }
@@ -233,7 +235,11 @@ public class GameState implements Comparable<GameState> {
         return allResources;
     }
 
-    public List<Peasant> getPeasants() {
+    public Peasant getPeasant(int peasantID) {
+        return peasants.get(peasantID);
+    }
+
+    public Map<Integer, Peasant> getPeasantsMap() {
         return peasants;
     }
 

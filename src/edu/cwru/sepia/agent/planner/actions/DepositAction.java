@@ -5,11 +5,20 @@ import edu.cwru.sepia.agent.planner.Peasant;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents the Deposit action.
  */
 public class DepositAction implements StripsAction {
+
+    private int peasantID;
+
+    public DepositAction(int peasantID) {
+        this.peasantID = peasantID;
+    }
+
     /**
      * Preconditions are met if the peasant is next to the town hall and it is carrying a resource.
      * @param state GameState to check if action is applicable
@@ -17,11 +26,7 @@ public class DepositAction implements StripsAction {
      */
     @Override
     public boolean preconditionsMet(GameState state) {
-        if (state.getPeasants().size() != 1) {
-            return false;
-        }
-
-        Peasant peasant = state.getPeasants().get(0);
+        Peasant peasant = state.getPeasant(peasantID);
         return peasant.getPosition().isAdjacent(state.getTownhall()) && peasant.isCarrying();
     }
 
@@ -33,8 +38,8 @@ public class DepositAction implements StripsAction {
      */
     @Override
     public GameState apply(GameState state) {
-        Peasant peasant = state.getPeasants().get(0);
-        Peasant newPeasant = new Peasant(peasant.getPosition());
+        Peasant peasant = state.getPeasant(peasantID);
+        Peasant newPeasant = new Peasant(peasantID, peasant.getPosition());
 
         int newGoldAmount = state.getCurrentGold();
         int newWoodAmount = state.getCurrentWood();
@@ -45,6 +50,9 @@ public class DepositAction implements StripsAction {
             newWoodAmount += 100;
         }
 
-        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), Arrays.asList(newPeasant), newGoldAmount, newWoodAmount);
+        Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
+        newPeasantMap.put(peasantID, newPeasant);
+
+        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, newGoldAmount, newWoodAmount);
     }
 }
