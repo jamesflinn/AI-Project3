@@ -81,7 +81,7 @@ public class GameState implements Comparable<GameState> {
             if (unitType.equals("townhall")) {
                 townhall = new Position(unit.getXPosition(), unit.getYPosition());
             } else if (unitType.equals("peasant")) {
-                peasants.put(unit.getID(), new Peasant(new Position(unit.getXPosition(), unit.getYPosition())));
+                peasants.put(unit.getID(), new Peasant(unit.getID(), new Position(unit.getXPosition(), unit.getYPosition())));
             }
         }
     }
