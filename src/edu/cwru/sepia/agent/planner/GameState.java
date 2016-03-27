@@ -1,14 +1,12 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.agent.planner.actions.StripsAction;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
 import javafx.geometry.Pos;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is used to represent the state of the game after applying one of the avaiable actions. It will also
@@ -42,6 +40,8 @@ public class GameState implements Comparable<GameState> {
 
     private Position townhall;
     private Map<Integer, Peasant> peasants;
+
+    private Stack<StripsAction> previousActions;
 
     /**
      * Construct a GameState from a stateview object. This is used to construct the initial search node. All other
@@ -84,15 +84,21 @@ public class GameState implements Comparable<GameState> {
                 peasants.put(unit.getID(), new Peasant(unit.getID(), new Position(unit.getXPosition(), unit.getYPosition())));
             }
         }
+
+        this.previousActions = new Stack<>();
     }
 
     /**
-     * Construct a GameState from a previous GameState object.
-     * @param state The previous state
-     * @param currentGold The current gold
-     * @param currentWood The current wood
+     * Construct a GameState from a previous GameState
+     * @param state the previous GameState
+     * @param goldLocations the locations of gold mines
+     * @param treeLocations the locations of trees
+     * @param peasants the peasants
+     * @param currentGold the current amount of gold a player has
+     * @param currentWood the current amount of wood a player has
+     * @param action the previous action that led to this GameState
      */
-    public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, Map<Integer, Peasant> peasants, int currentGold, int currentWood) {
+    public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, Map<Integer, Peasant> peasants, int currentGold, int currentWood, StripsAction action) {
         this.playerNum = state.getPlayerNum();
         this.buildPeasants = state.isBuildPeasants();
         this.requiredGold = state.getRequiredGold();
@@ -104,6 +110,8 @@ public class GameState implements Comparable<GameState> {
         this.peasants = state.getPeasantsMap();
         this.currentGold = currentGold;
         this.currentWood = currentWood;
+
+        this.previousActions.add(action);
     }
 
     /**

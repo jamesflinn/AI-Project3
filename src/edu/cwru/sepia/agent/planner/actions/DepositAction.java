@@ -53,6 +53,6 @@ public class DepositAction implements StripsAction {
         Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
         newPeasantMap.put(peasantID, newPeasant);
 
-        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, newGoldAmount, newWoodAmount);
+        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, newGoldAmount, newWoodAmount, this);
     }
 }

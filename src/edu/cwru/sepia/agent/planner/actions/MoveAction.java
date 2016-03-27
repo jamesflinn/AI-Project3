@@ -53,6 +53,6 @@ public class MoveAction implements StripsAction {
         Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
         newPeasantMap.put(peasantID, newPeasant);
 
-        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold(), state.getCurrentWood());
+        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), this);
     }
 }
