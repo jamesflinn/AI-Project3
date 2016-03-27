@@ -102,6 +102,17 @@ public class PEAgent extends Agent {
      * @return SEPIA representation of same action
      */
     private Action createSepiaAction(StripsAction action) {
+        if (action instanceof MoveAction) {
+            MoveAction moveAction = (MoveAction) action;
+            return Action.createCompoundMove(moveAction.getPeasantID(), moveAction.getTargetPosition().x, moveAction.getTargetPosition().y);
+        } else if (action instanceof HarvestAction) {
+            HarvestAction harvestAction = (HarvestAction) action;
+            return Action.createPrimitiveGather(harvestAction.getPeasantID(), harvestAction.getResourceDirection());
+        } else if (action instanceof DepositAction) {
+            DepositAction depositAction = (DepositAction) action;
+            return Action.createPrimitiveDeposit(depositAction.getPeasantID(), depositAction.getTownhallDirection());
+        }
+
         return null;
     }
 

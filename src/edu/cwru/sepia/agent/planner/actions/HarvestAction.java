@@ -2,8 +2,10 @@ package edu.cwru.sepia.agent.planner.actions;
 
 import edu.cwru.sepia.agent.planner.GameState;
 import edu.cwru.sepia.agent.planner.Peasant;
+import edu.cwru.sepia.agent.planner.Position;
 import edu.cwru.sepia.agent.planner.ResourceLocation;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
+import edu.cwru.sepia.util.Direction;
 
 import java.util.*;
 
@@ -13,6 +15,7 @@ import java.util.*;
 public class HarvestAction implements StripsAction {
 
     private int peasantID;
+    private Direction resourceDirection;
 
     public HarvestAction(int peasantID) {
         this.peasantID = peasantID;
@@ -41,6 +44,7 @@ public class HarvestAction implements StripsAction {
     public GameState apply(GameState state) {
         Peasant oldPeasant = state.getPeasant(peasantID);
         ResourceLocation adjResource = findAdjResource(oldPeasant, state.getGoldLocations(), state.getTreeLocations());
+        resourceDirection = oldPeasant.getPosition().getDirection(adjResource.getPosition());
 
         Peasant newPeasant = new Peasant(peasantID, oldPeasant.getPosition(), adjResource.getResourceType());
 
@@ -87,5 +91,13 @@ public class HarvestAction implements StripsAction {
         }
         // no adjacent resource found
         return null;
+    }
+
+    public int getPeasantID() {
+        return peasantID;
+    }
+
+    public Direction getResourceDirection() {
+        return resourceDirection;
     }
 }

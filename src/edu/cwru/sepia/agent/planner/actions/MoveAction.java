@@ -55,4 +55,16 @@ public class MoveAction implements StripsAction {
 
         return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), this);
     }
+
+    public int getPeasantID() {
+        return peasantID;
+    }
+
+    public Position getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public Position getTargetPosition() {
+        return targetPosition;
+    }
 }

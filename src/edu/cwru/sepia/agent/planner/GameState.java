@@ -177,7 +177,7 @@ public class GameState implements Comparable<GameState> {
      *
      * @return The current cost to reach this goal
      */
-    public double getCost() {
+        public double getCost() {
         // TODO: Implement me!
         return 0.0;
     }
@@ -244,8 +244,6 @@ public class GameState implements Comparable<GameState> {
                 new Position(x, y + 1),
                 new Position(x + 1, y + 1)
         );
-
-
     }
 
     public int getPlayerNum() {
