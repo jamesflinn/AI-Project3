@@ -1,5 +1,8 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.agent.planner.actions.DepositAction;
+import edu.cwru.sepia.agent.planner.actions.HarvestAction;
+import edu.cwru.sepia.agent.planner.actions.MoveAction;
 import edu.cwru.sepia.agent.planner.actions.StripsAction;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
@@ -132,8 +135,26 @@ public class GameState implements Comparable<GameState> {
      * @return A list of the possible successor states and their associated actions
      */
     public List<GameState> generateChildren() {
-        // TODO: Implement me!
-        return null;
+        List<GameState> children = new ArrayList<>();
+        for (Peasant peasant : peasants.values()) {
+            HarvestAction harvestAction = new HarvestAction(peasant.getID());
+            if (harvestAction.preconditionsMet(this)) {
+                children.add(harvestAction.apply(this));
+            }
+
+            DepositAction depositAction = new DepositAction(peasant.getID());
+            if (depositAction.preconditionsMet(this)) {
+                children.add(depositAction.apply(this));
+            }
+
+            for (Position position : getAllAdjacentPositions(peasant.getPosition())) {
+                MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), position);
+                if (moveAction.preconditionsMet(this)) {
+                    children.add(moveAction.apply(this));
+                }
+            }
+        }
+        return children;
     }
 
     /**
@@ -203,6 +224,28 @@ public class GameState implements Comparable<GameState> {
         result = 31 * result + goldLocations.hashCode();
         result = 31 * result + treeLocations.hashCode();
         return result;
+    }
+
+    /**
+     * Finds all positions adjacent to the given position
+     * @param position the given position
+     * @return A list of all adjacent positions
+     */
+    private List<Position> getAllAdjacentPositions(Position position) {
+        int x = position.x;
+        int y = position.y;
+        return Arrays.asList(
+                new Position(x - 1, y - 1),
+                new Position(x, y - 1),
+                new Position(x + 1, y - 1),
+                new Position(x - 1, y),
+                new Position(x + 1, y),
+                new Position(x - 1, y+ 1),
+                new Position(x, y + 1),
+                new Position(x + 1, y + 1)
+        );
+
+
     }
 
     public int getPlayerNum() {
