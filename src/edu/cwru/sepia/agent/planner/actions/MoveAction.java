@@ -35,6 +35,11 @@ public class MoveAction implements StripsAction {
                 !state.getPeasantsMap().values().stream().anyMatch((p) -> p.getPosition().equals(targetPosition));
     }
 
+    /**
+     * Returns a new GameState such that the peasant is now located at targetPosition.
+     * @param state State to apply action to
+     * @return the new GameState
+     */
     @Override
     public GameState apply(GameState state) {
         Peasant peasant = state.getPeasant(peasantID);
