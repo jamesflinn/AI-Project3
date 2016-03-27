@@ -254,4 +254,8 @@ public class GameState implements Comparable<GameState> {
     public Position getTownhall() {
         return townhall;
     }
+
+    public Stack<StripsAction> getPreviousActions() {
+        return previousActions;
+    }
 }

@@ -8,6 +8,7 @@ import edu.cwru.sepia.environment.model.state.State;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by  on 3/15/15.
@@ -104,15 +105,14 @@ public class PlannerAgent extends Agent {
         HashMap<GameState, Double> gScore = new HashMap<>();
 
         GameState current = startState;
-        // TODO: Must change calculateHeuristic, don't have explicit goal state
-        fScore.put(current, calculateHeuristic(current, goal)); // initial estimate to goal
+        fScore.put(current, current.heuristic());               // initial estimate to goal
         gScore.put(current, 0.0);                               // initial cost of optimal path
 
         while (!openSet.isEmpty()) {
             System.out.println("CURRENT NODE IS: " + current.toString());
 
             GameState smallest = openSet.get(0);
-            //finding node with smallest fScore value
+            // finding node with smallest fScore value
             for (GameState loc : openSet) {
                 if (fScore.get(loc) < fScore.get(smallest)) {
                     smallest = loc;
@@ -120,19 +120,19 @@ public class PlannerAgent extends Agent {
                 }
             }
             current = smallest;
-            //goal node is found, return path
+            // goal node is found, return path
             if (current.isGoal()) {
                 System.out.println(current.toString()+" GOAL FOUND!!!!!!!!!!!!!!!!!!!!");
-                return reconstructPath(explored, current);
+                return current.getPreviousActions();
             }
 
-            //finished with the current node, so move it from Open to Closed
+            // finished with the current node, so move it from Open to Closed
             openSet.remove(current);
             closedSet.add(current);
 
             //examine the current nodes neighbors for the next most valid candidate
             //examines all neighbor nodes that aren't closed or resources
-            List<GameState> neighbors = getNeighbors(current, xExtent, yExtent, resourceLocations, closedSet);
+            List<GameState> neighbors = current.generateChildren().stream().filter((c) -> !closedSet.contains(c)).collect(Collectors.toList());
 
             for (GameState neighbor : neighbors) {
                 if (gScore.get(neighbor) == null) {
@@ -141,9 +141,7 @@ public class PlannerAgent extends Agent {
                 }
 
                 //get distance between two nodes
-                // TODO: must calculate tentativeGScore differently
-//                double distance = Math.sqrt(Math.pow((neighbor.x - current.x), 2) + Math.pow((neighbor.y - current.y), 2));
-//                double tentativeGScore = gScore.get(current) + distance;
+                double tentativeGScore = gScore.get(current) + neighbor.getCost(); // TODO: Check if this is right.
 
                 //check if neighbor is in openSet
                 if (!openSet.contains(neighbor)) {
@@ -156,12 +154,13 @@ public class PlannerAgent extends Agent {
                 //use map instead of array to show explored from
                 explored.put(neighbor, current);
                 gScore.put(neighbor, tentativeGScore);
-                fScore.put(neighbor, (gScore.get(neighbor)+ calculateHeuristic(neighbor, goal)));
+                fScore.put(neighbor, (gScore.get(neighbor)+ neighbor.heuristic()));
             }
         }
+
         // return an empty path
         System.out.println("Returning NOTHING");
-        return new Stack<StripsAction>();
+        return new Stack<>();
     }
 
     /**
