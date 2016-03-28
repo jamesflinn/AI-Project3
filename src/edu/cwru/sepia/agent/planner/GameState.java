@@ -99,7 +99,6 @@ public class GameState implements Comparable<GameState> {
      * @param peasants the peasants
      * @param currentGold the current amount of gold a player has
      * @param currentWood the current amount of wood a player has
-     * @param action the previous action that led to this GameState
      */
     public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, Map<Integer, Peasant> peasants, int currentGold, int currentWood, Stack<StripsAction> actions) {
         this.playerNum = state.getPlayerNum();
@@ -244,6 +243,18 @@ public class GameState implements Comparable<GameState> {
                 new Position(x, y + 1),
                 new Position(x + 1, y + 1)
         );
+    }
+
+    @Override
+    public String toString() {
+        return "GameState {" + "\n\t" +
+                "currentGold=" + currentGold + ",\n\t" +
+                "currentWood=" + currentWood + ",\n\t" +
+                "goldLocations=" + Arrays.toString(goldLocations.toArray()) + ",\n\t" +
+                "treeLocations=" + Arrays.toString(treeLocations.toArray()) + ",\n\t" +
+                "peasants=" + Arrays.toString(peasants.values().toArray()) + ",\n\t" +
+                "previousActions=" + Arrays.toString(previousActions.toArray()) +
+                '}';
     }
 
     public int getPlayerNum() {

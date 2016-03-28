@@ -37,6 +37,15 @@ public class ResourceLocation {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "ResourceLocation{" +
+                "amount=" + amount +
+                ", position=" + position +
+                ", resourceType=" + resourceType +
+                '}';
+    }
+
     public int getAmount() {
         return amount;
     }

@@ -50,6 +50,16 @@ public class Peasant {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "Peasant{" +
+                "id=" + id +
+                ", position=" + position +
+                ", isCarrying=" + isCarrying +
+                ", resourceType=" + resourceType +
+                '}';
+    }
+
     public boolean isCarrying() {
         return isCarrying;
     }
