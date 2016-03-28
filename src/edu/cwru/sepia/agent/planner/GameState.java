@@ -101,7 +101,7 @@ public class GameState implements Comparable<GameState> {
      * @param currentWood the current amount of wood a player has
      * @param action the previous action that led to this GameState
      */
-    public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, Map<Integer, Peasant> peasants, int currentGold, int currentWood, StripsAction action) {
+    public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, Map<Integer, Peasant> peasants, int currentGold, int currentWood, Stack<StripsAction> actions) {
         this.playerNum = state.getPlayerNum();
         this.buildPeasants = state.isBuildPeasants();
         this.requiredGold = state.getRequiredGold();
@@ -110,11 +110,11 @@ public class GameState implements Comparable<GameState> {
 
         this.goldLocations = goldLocations;
         this.treeLocations = treeLocations;
-        this.peasants = state.getPeasantsMap();
+        this.peasants = peasants;
         this.currentGold = currentGold;
         this.currentWood = currentWood;
 
-        this.previousActions.add(action);
+        this.previousActions = actions;
     }
 
     /**
@@ -178,8 +178,8 @@ public class GameState implements Comparable<GameState> {
      * @return The current cost to reach this goal
      */
         public double getCost() {
-        // TODO: Implement me!
-        return 0.0;
+            // TODO: Assumes each action is cost 1, probably need to change this.
+            return previousActions.size();
     }
 
     /**

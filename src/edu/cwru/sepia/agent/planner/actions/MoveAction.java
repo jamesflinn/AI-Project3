@@ -6,6 +6,7 @@ import edu.cwru.sepia.agent.planner.Position;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Represents the Move action.
@@ -53,7 +54,10 @@ public class MoveAction implements StripsAction {
         Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
         newPeasantMap.put(peasantID, newPeasant);
 
-        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), this);
+        Stack<StripsAction> actions = (Stack<StripsAction>) state.getPreviousActions().clone();
+        actions.push(this);
+
+        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), actions);
     }
 
     public int getPeasantID() {

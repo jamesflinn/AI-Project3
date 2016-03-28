@@ -8,6 +8,7 @@ import edu.cwru.sepia.util.Direction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Represents the Deposit action.
@@ -56,7 +57,10 @@ public class DepositAction implements StripsAction {
         Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
         newPeasantMap.put(peasantID, newPeasant);
 
-        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, newGoldAmount, newWoodAmount, this);
+        Stack<StripsAction> actions = (Stack<StripsAction>) state.getPreviousActions().clone();
+        actions.push(this);
+
+        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, newGoldAmount, newWoodAmount, actions);
     }
 
     public int getPeasantID() {

@@ -67,7 +67,10 @@ public class HarvestAction implements StripsAction {
         Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
         newPeasantMap.put(peasantID, newPeasant);
 
-        return new GameState(state, newGoldLocations, newTreeLocations, newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), this);
+        Stack<StripsAction> actions = (Stack<StripsAction>) state.getPreviousActions().clone();
+        actions.push(this);
+
+        return new GameState(state, newGoldLocations, newTreeLocations, newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), actions);
     }
 
     /**
