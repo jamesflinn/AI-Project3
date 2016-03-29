@@ -174,8 +174,20 @@ public class GameState implements Comparable<GameState> {
      * @return The value estimated remaining cost to reach a goal state from this state.
      */
     public double heuristic() {
-        // TODO: Implement me!
-        return 0.0;
+        double heuristic = 0;
+
+        heuristic += currentGold;
+        heuristic += currentWood;
+
+        for (Peasant peasant : peasants.values()) {
+            if (peasant.isCarrying()) {
+                heuristic += peasant.getPosition().euclideanDistance(townhall);
+            } else {
+                heuristic += peasant.getPosition().euclideanDistance(findClosestResourcePosition(peasant.getPosition()));
+            }
+        }
+
+        return heuristic;
     }
 
     /**
@@ -318,5 +330,21 @@ public class GameState implements Comparable<GameState> {
 
     public Stack<StripsAction> getPreviousActions() {
         return previousActions;
+    }
+
+    /**
+     * Finds the closest resource to the given position
+     * @param position The given position
+     * @return the closest resource position
+     */
+    private Position findClosestResourcePosition(Position position) {
+        Position closestResourcePosition = new Position(Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+        for (ResourceLocation resourceLocation : getAllResourceLocations()) {
+            if (position.euclideanDistance(resourceLocation.getPosition()) < position.euclideanDistance(closestResourcePosition)) {
+                closestResourcePosition = resourceLocation.getPosition();
+            }
+        }
+        return closestResourcePosition;
     }
 }
