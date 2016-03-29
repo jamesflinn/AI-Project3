@@ -146,18 +146,20 @@ public class GameState implements Comparable<GameState> {
                 children.add(depositAction.apply(this));
             }
 
-            // Move to all resource locations
-            for (ResourceLocation resource : getAllResourceLocations()) {
-                MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), resource.getPosition());
+            if (peasant.isCarrying()) {
+                // Move to townhall
+                MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), townhall);
                 if (moveAction.preconditionsMet(this)) {
                     children.add(moveAction.apply(this));
                 }
-            }
-
-            // Move to townhall
-            MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), townhall);
-            if (moveAction.preconditionsMet(this)) {
-                children.add(moveAction.apply(this));
+            } else {
+                // Move to all resource locations
+                for (ResourceLocation resource : getAllResourceLocations()) {
+                    MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), resource.getPosition());
+                    if (moveAction.preconditionsMet(this)) {
+                        children.add(moveAction.apply(this));
+                    }
+                }
             }
         }
         return children;
