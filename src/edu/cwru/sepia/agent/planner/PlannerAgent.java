@@ -136,6 +136,7 @@ public class PlannerAgent extends Agent {
             //examines all neighbor nodes that aren't closed or resources
             List<GameState> neighbors = current.generateChildren().stream().filter((c) -> !closedSet.contains(c)).collect(Collectors.toList());
             for (GameState neighbor : neighbors) {
+
                     if (gScore.get(neighbor) == null) {
                     //gScore not found yet, initialize to VERY big
                     gScore.put(neighbor, Double.MAX_VALUE);
