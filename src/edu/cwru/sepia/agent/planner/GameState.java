@@ -164,10 +164,21 @@ public class GameState implements Comparable<GameState> {
                 }
             } else {
                 // Move to all resource locations
-                for (ResourceLocation resource : getAllResourceLocations()) {
-                    MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()), xExtent, yExtent);
-                    if (moveAction.preconditionsMet(this)) {
-                        children.add(moveAction.apply(this));
+                if (currentGold < requiredGold) {
+                    for (ResourceLocation resource : goldLocations) {
+                        MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()), xExtent, yExtent);
+                        if (moveAction.preconditionsMet(this)) {
+                            children.add(moveAction.apply(this));
+                        }
+                    }
+                }
+
+                if (currentWood < requiredWood) {
+                    for (ResourceLocation resource : treeLocations) {
+                        MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()), xExtent, yExtent);
+                        if (moveAction.preconditionsMet(this)) {
+                            children.add(moveAction.apply(this));
+                        }
                     }
                 }
             }
