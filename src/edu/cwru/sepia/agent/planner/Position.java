@@ -116,15 +116,15 @@ public class Position {
         int yDiff = position.y - y;
 
         // figure out the direction the footman needs to move in
-        if(xDiff == 1 && yDiff == 1)
+        if((xDiff == 1 && yDiff == 1) )
         {
             return Direction.SOUTHEAST;
         }
-        else if(xDiff == 1 && yDiff == 0)
+        else if((xDiff == 1 && yDiff == 0))
         {
             return Direction.EAST;
         }
-        else if(xDiff == 1 && yDiff == -1)
+        else if((xDiff == 1 && yDiff == -1))
         {
             return Direction.NORTHEAST;
         }
@@ -140,7 +140,7 @@ public class Position {
         {
             return Direction.SOUTHWEST;
         }
-        else if(xDiff == -1 && yDiff == 0)
+        else if((xDiff == -1 && yDiff == 0) || (x > position.x && y == position.y))
         {
             return Direction.WEST;
         }
@@ -148,9 +148,33 @@ public class Position {
         {
             return Direction.NORTHWEST;
         }
+        else if(x == position.x && y < position.y){
+            return Direction.NORTH;
+        }
+        else if(x==position.x && y > position.y){
+            return Direction.SOUTH;
+        }
+        else if(x>position.x && y == position.y){
+            return Direction.WEST;
+        }
+        else if(x < position.x && y == position.y){
+            return Direction.EAST;
+        }
+        else if(position.x > x && position.y > y ){
+            return Direction.NORTHEAST;
+        }
+        else if(position.x<x && position.y<y){
+            return Direction.SOUTHWEST;
+        }
+        else if(position.x<x && position.y>y){
+            return Direction.NORTHWEST;
+        }
+        else /**if(position.x>x && position.y <y)**/{
+            return Direction.SOUTHEAST;
+        }
 
-        System.err.println("Position not adjacent. Could not determine direction");
-        return null;
+        //System.err.println("Position not adjacent. Could not determine direction");
+        //return Direction;
     }
 
     /**

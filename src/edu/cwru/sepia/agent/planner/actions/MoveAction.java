@@ -25,7 +25,7 @@ public class MoveAction implements StripsAction {
 
     /**
      * Preconditions are met if the peasant is located at currentPosition,
-     * and if there is nothing at targetPosition.
+     * and if there is nothing at targetPosition. Also check to
      * @param state GameState to check if action is applicable
      * @return true if preconditions are met
      */
@@ -70,5 +70,10 @@ public class MoveAction implements StripsAction {
 
     public Position getTargetPosition() {
         return targetPosition;
+    }
+
+
+    public boolean isAdjacent(Position targetPosition, Position currentPosition) {
+        return Math.abs(targetPosition.x - currentPosition.x) <= 1 && Math.abs(targetPosition.y - currentPosition.y) <= 1;
     }
 }

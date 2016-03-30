@@ -124,6 +124,7 @@ public class GameState implements Comparable<GameState> {
      * @return true if the goal conditions are met in this instance of game state.
      */
     public boolean isGoal() {
+
         return currentGold >= requiredGold && currentWood >= requiredWood;
     }
 
@@ -231,8 +232,12 @@ public class GameState implements Comparable<GameState> {
         if (buildPeasants != gameState.buildPeasants) return false;
         if (requiredGold != gameState.requiredGold) return false;
         if (requiredWood != gameState.requiredWood) return false;
+        if (currentGold != gameState.currentGold) return false;
+        if (currentWood != gameState.currentWood) return false;
         if (!goldLocations.equals(gameState.goldLocations)) return false;
-        return treeLocations.equals(gameState.treeLocations);
+        if (!treeLocations.equals(gameState.treeLocations)) return false;
+        return peasants.equals(gameState.peasants);
+
     }
 
     @Override
@@ -241,8 +246,11 @@ public class GameState implements Comparable<GameState> {
         result = 31 * result + (buildPeasants ? 1 : 0);
         result = 31 * result + requiredGold;
         result = 31 * result + requiredWood;
+        result = 31 * result + currentGold;
+        result = 31 * result + currentWood;
         result = 31 * result + goldLocations.hashCode();
         result = 31 * result + treeLocations.hashCode();
+        result = 31 * result + peasants.hashCode();
         return result;
     }
 
