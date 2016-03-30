@@ -52,16 +52,9 @@ public class HarvestAction implements StripsAction {
         List<ResourceLocation> newTreeLocations = new ArrayList<>(state.getTreeLocations());
 
         if (adjResource.getResourceType() == ResourceNode.Type.GOLD_MINE) {
-            newGoldLocations.set(
-                    state.getGoldLocations().indexOf(adjResource),
-                    new ResourceLocation(adjResource.getPosition(), adjResource.getResourceType(), adjResource.getAmount() - 100)
-            );
+            addNewResourceToList(newGoldLocations, adjResource);
         } else {
-            newTreeLocations.set(
-                    state.getTreeLocations().indexOf(adjResource),
-                    new ResourceLocation(adjResource.getPosition(), adjResource.getResourceType(), adjResource.getAmount() - 100)
-            );
-
+            addNewResourceToList(newTreeLocations, adjResource);
         }
 
         Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
@@ -71,6 +64,25 @@ public class HarvestAction implements StripsAction {
         actions.push(this);
 
         return new GameState(state, newGoldLocations, newTreeLocations, newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), actions);
+    }
+
+    /**
+     * Adds a new resource to the list, with 100 less resources. If there are no more resources, it is deleted from the list.
+     * @param resources The list to be changed
+     * @param resource The resource to be changed
+     * @return A new list
+     */
+    private List<ResourceLocation> addNewResourceToList(List<ResourceLocation> resources, ResourceLocation resource) {
+        if (resource.getAmount() - 100 > 0) {
+            resources.set(
+                    resources.indexOf(resource),
+                    new ResourceLocation(resource.getPosition(), resource.getResourceType(), resource.getAmount() - 100)
+            );
+        } else {
+            resources.remove(resource);
+        }
+
+        return resources;
     }
 
     /**
