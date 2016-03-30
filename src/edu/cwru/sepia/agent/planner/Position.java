@@ -52,7 +52,7 @@ public class Position {
      * @return List of adjacent positions
      */
     public List<Position> getAdjacentPositions() {
-        List<Position> positions = new ArrayList<Position>();
+        List<Position> positions = new ArrayList<>();
 
         for (Direction direction : Direction.values()) {
             positions.add(move(direction));
