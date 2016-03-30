@@ -178,15 +178,28 @@ public class GameState implements Comparable<GameState> {
      */
     public double heuristic() {
         double heuristic = 0;
-
-        heuristic += currentGold;
-        heuristic += currentWood;
+        int goldNeeded = requiredGold - currentGold;
+        int woodNeeded = requiredWood - currentWood;
+        int tripsGold = goldNeeded/100;
+        int tripsWood = woodNeeded/100;
 
         for (Peasant peasant : peasants.values()) {
-            if (peasant.isCarrying()) {
-                heuristic += peasant.getPosition().euclideanDistance(townhall);
+            if (peasant.isCarrying() && peasant.getResourceType().equals(ResourceNode.Type.GOLD_MINE)) {
+                int distanceToTownhall= peasant.getPosition().chebyshevDistance(townhall);
+                heuristic += 2 * (distanceToTownhall * (tripsGold - 1)) + distanceToTownhall;
             } else {
-                heuristic += peasant.getPosition().euclideanDistance(findClosestResourcePosition(peasant.getPosition()));
+                int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.GOLD_MINE));
+                heuristic += 2 * distanceToResource * tripsWood;
+            }
+        }
+
+        for (Peasant peasant : peasants.values()) {
+            if (peasant.isCarrying() && peasant.getResourceType().equals(ResourceNode.Type.TREE)) {
+                int distanceToTownhall= peasant.getPosition().chebyshevDistance(townhall);
+                heuristic += 2 * (distanceToTownhall * (tripsGold - 1)) + distanceToTownhall;
+            } else {
+                int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.TREE));
+                heuristic += 2 * distanceToResource * tripsWood;
             }
         }
 
@@ -347,11 +360,11 @@ public class GameState implements Comparable<GameState> {
      * @param position The given position
      * @return the closest resource position
      */
-    private Position findClosestResourcePosition(Position position) {
+    private Position findClosestResourcePosition(Position position, ResourceNode.Type resourceType) {
         Position closestResourcePosition = new Position(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
         for (ResourceLocation resourceLocation : getAllResourceLocations()) {
-            if (position.euclideanDistance(resourceLocation.getPosition()) < position.euclideanDistance(closestResourcePosition)) {
+            if (resourceLocation.getResourceType().equals(resourceType) && position.chebyshevDistance(resourceLocation.getPosition()) < position.chebyshevDistance(closestResourcePosition)) {
                 closestResourcePosition = resourceLocation.getPosition();
             }
         }
