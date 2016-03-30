@@ -109,33 +109,33 @@ public class PlannerAgent extends Agent {
         gScore.put(current, 0.0);                               // initial cost of optimal path
 
         while (!openSet.isEmpty()) {
-            System.out.println("CURRENT NODE IS: " + current.toString());
+            //System.out.println("CURRENT NODE IS: " + current.toString());
 
             GameState smallest = openSet.get(0);
             // finding node with smallest fScore value
             for (GameState loc : openSet) {
                 if (fScore.get(loc) < fScore.get(smallest)) {
                     smallest = loc;
-                    System.out.println("NEW NODE IS: " + smallest.toString());
+                    //System.out.println("NEW NODE IS: " + smallest.toString());
                 }
             }
             current = smallest;
             // goal node is found, return path
             if (current.isGoal()) {
                 System.out.println(current.toString()+" GOAL FOUND!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("List of actions:"+current.getPreviousActions().toString());
                 return current.getPreviousActions();
             }
 
             // finished with the current node, so move it from Open to Closed
             openSet.remove(current);
             closedSet.add(current);
-
             //examine the current nodes neighbors for the next most valid candidate
             //examines all neighbor nodes that aren't closed or resources
             List<GameState> neighbors = current.generateChildren().stream().filter((c) -> !closedSet.contains(c)).collect(Collectors.toList());
-
             for (GameState neighbor : neighbors) {
-                if (gScore.get(neighbor) == null) {
+                //System.out.println("Neighbor"+neighbor.toString());
+                    if (gScore.get(neighbor) == null) {
                     //gScore not found yet, initialize to VERY big
                     gScore.put(neighbor, Double.MAX_VALUE);
                 }
