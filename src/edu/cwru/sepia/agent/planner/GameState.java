@@ -162,7 +162,7 @@ public class GameState implements Comparable<GameState> {
                 if (depositAction.preconditionsMet(this)) {
                     children.add(depositAction.apply(this));
                 }
-            } else {
+            } else if (!peasant.isCarrying() && peasant.getPosition().isAdjacent(townhall)){
                 // Move to all resource locations
                 if (currentGold < requiredGold) {
                     for (ResourceLocation resource : goldLocations) {
@@ -183,6 +183,8 @@ public class GameState implements Comparable<GameState> {
                 }
             }
         }
+
+        System.out.println(children.size());
         return children;
     }
 
