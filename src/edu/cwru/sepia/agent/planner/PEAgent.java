@@ -13,10 +13,7 @@ import edu.cwru.sepia.environment.model.state.Unit;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * This is an outline of the PEAgent. Implement the provided methods. You may add your own methods and members.
@@ -38,7 +35,12 @@ public class PEAgent extends Agent {
     public PEAgent(int playernum, Stack<StripsAction> plan) {
         super(playernum);
         peasantIdMap = new HashMap<Integer, Integer>();
-        this.plan = plan;
+        List<StripsAction> stackList = new ArrayList<>(plan);
+        Stack<StripsAction> reversePlan = new Stack<StripsAction>();
+        for(int i = stackList.size()-1; i>=0;i--){
+            reversePlan.push(stackList.get(i));
+        }
+        this.plan = reversePlan;
 
     }
 
