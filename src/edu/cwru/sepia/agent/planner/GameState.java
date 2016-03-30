@@ -32,6 +32,9 @@ public class GameState implements Comparable<GameState> {
 
     private int playerNum;
 
+    private int xExtent;
+    private int yExtent;
+
     private boolean buildPeasants;
     private int requiredGold;
     private int requiredWood;
@@ -58,6 +61,8 @@ public class GameState implements Comparable<GameState> {
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
         this.playerNum = playernum;
+        this.xExtent = state.getXExtent();
+        this.yExtent = state.getYExtent();
         this.buildPeasants = buildPeasants;
         this.requiredGold = requiredGold;
         this.requiredWood = requiredWood;
@@ -102,6 +107,8 @@ public class GameState implements Comparable<GameState> {
      */
     public GameState(GameState state , List<ResourceLocation> goldLocations, List<ResourceLocation> treeLocations, Map<Integer, Peasant> peasants, int currentGold, int currentWood, Stack<StripsAction> actions) {
         this.playerNum = state.getPlayerNum();
+        this.xExtent = state.getxExtent();
+        this.yExtent = state.getyExtent();
         this.buildPeasants = state.isBuildPeasants();
         this.requiredGold = state.getRequiredGold();
         this.requiredWood = state.getRequiredWood();
@@ -142,23 +149,36 @@ public class GameState implements Comparable<GameState> {
                 children.add(harvestAction.apply(this));
             }
 
-            DepositAction depositAction = new DepositAction(peasant.getID());
-            if (depositAction.preconditionsMet(this)) {
-                children.add(depositAction.apply(this));
-            }
 
             if (peasant.isCarrying()) {
                 // Move to townhall
-                MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), townhall));
+                MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), townhall), xExtent, yExtent);
                 if (moveAction.preconditionsMet(this)) {
                     children.add(moveAction.apply(this));
                 }
+
+                // Deposit resources
+                DepositAction depositAction = new DepositAction(peasant.getID());
+                if (depositAction.preconditionsMet(this)) {
+                    children.add(depositAction.apply(this));
+                }
             } else {
                 // Move to all resource locations
-                for (ResourceLocation resource : getAllResourceLocations()) {
-                    MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()));
-                    if (moveAction.preconditionsMet(this)) {
-                        children.add(moveAction.apply(this));
+                if (currentGold < requiredGold) {
+                    for (ResourceLocation resource : goldLocations) {
+                        MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()), xExtent, yExtent);
+                        if (moveAction.preconditionsMet(this)) {
+                            children.add(moveAction.apply(this));
+                        }
+                    }
+                }
+
+                if (currentWood < requiredWood) {
+                    for (ResourceLocation resource : treeLocations) {
+                        MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()), xExtent, yExtent);
+                        if (moveAction.preconditionsMet(this)) {
+                            children.add(moveAction.apply(this));
+                        }
                     }
                 }
             }
@@ -267,26 +287,6 @@ public class GameState implements Comparable<GameState> {
         return result;
     }
 
-    /**
-     * Finds all positions adjacent to the given position
-     * @param position the given position
-     * @return A list of all adjacent positions
-     */
-    private List<Position> getAllAdjacentPositions(Position position) {
-        int x = position.x;
-        int y = position.y;
-        return Arrays.asList(
-                new Position(x - 1, y - 1),
-                new Position(x, y - 1),
-                new Position(x + 1, y - 1),
-                new Position(x - 1, y),
-                new Position(x + 1, y),
-                new Position(x - 1, y+ 1),
-                new Position(x, y + 1),
-                new Position(x + 1, y + 1)
-        );
-    }
-
     @Override
     public String toString() {
         return "GameState {" + "\n\t" +
@@ -353,6 +353,14 @@ public class GameState implements Comparable<GameState> {
         return previousActions;
     }
 
+    public int getxExtent() {
+        return xExtent;
+    }
+
+    public int getyExtent() {
+        return yExtent;
+    }
+
     /**
      * Finds the closest resource to the given position
      * @param position The given position
@@ -372,10 +380,12 @@ public class GameState implements Comparable<GameState> {
     private Position getClosestAdjacentPosition(Position start, Position end) {
         List<Position> adjacentPositions = end.getAdjacentPositions();
         Position closestAdjacentPosition = new Position(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        int closestAdjacentPositionDistance = start.chebyshevDistance(closestAdjacentPosition);
 
         for (Position adjacentPosition : adjacentPositions) {
-            if (start.chebyshevDistance(adjacentPosition) < start.chebyshevDistance(closestAdjacentPosition)) {
+            if (start.chebyshevDistance(adjacentPosition) < closestAdjacentPositionDistance) {
                 closestAdjacentPosition = adjacentPosition;
+                closestAdjacentPositionDistance = start.chebyshevDistance(adjacentPosition);
             }
         }
 
