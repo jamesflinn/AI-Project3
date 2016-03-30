@@ -8,7 +8,6 @@ import edu.cwru.sepia.environment.model.state.State;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by  on 3/15/15.
@@ -95,66 +94,33 @@ public class PlannerAgent extends Agent {
         System.out.println("Inside AStar");
         long startTime = System.nanoTime();
 
-        // TODO: Make open/closed sets HashSets
-        List<GameState> closedSet = new ArrayList<>();
-        List<GameState> openSet = new ArrayList<>();
+        Queue<GameState> priorityQueue = new PriorityQueue<>();
+        Set<GameState> closedList = new HashSet<>();
 
-        openSet.add(startState);
+        priorityQueue.add(startState);
 
-        HashMap<GameState, Double> fScore = new HashMap<>();
-        HashMap<GameState, Double> gScore = new HashMap<>();
+        while (!priorityQueue.isEmpty()) {
+            GameState current = priorityQueue.poll();
 
-        GameState current = startState;
-        fScore.put(current, current.heuristic());               // initial estimate to goal
-        gScore.put(current, 0.0);                               // initial cost of optimal path
-
-        while (!openSet.isEmpty()) {
-            // finding node with smallest fScore value
-            GameState smallest = openSet.get(0);
-            for (GameState loc : openSet) {
-                if (fScore.get(loc) < fScore.get(smallest)) {
-                    smallest = loc;
-                }
-            }
-            current = smallest;
-
-            // goal node is found, return path
             if (current.isGoal()) {
-                System.out.println("GOAL FOUND!!!!!!!!!!!!!!!!!!!!");
-
+                System.out.println("Found goal!");
                 long endTime = System.nanoTime();
                 long duration = (endTime - startTime) / 1000000;
                 System.out.println("A* took " + duration + "ms to complete.");
                 return current.getPreviousActions();
             }
 
-            // finished with the current node, so move it from Open to Closed
-            openSet.remove(current);
-            closedSet.add(current);
-
-            // examine the current nodes neighbors for the next most valid candidate
-            // examines all neighbor nodes that aren't closed or resources
-            List<GameState> neighbors = current.generateChildren().stream().filter((c) -> !closedSet.contains(c)).collect(Collectors.toList());
-            for (GameState neighbor : neighbors) {
-
-                if (gScore.get(neighbor) == null) {
-                    //gScore not found yet, initialize to VERY big
-                    gScore.put(neighbor, Double.MAX_VALUE);
-                }
-
-                //get distance between two nodes
-                double tentativeGScore = gScore.get(current) + neighbor.getCost(); // TODO: Check if this is right.
-
-                //check if neighbor is in openSet
-                if (!openSet.contains(neighbor)) {
-                    openSet.add(neighbor);
-                } else if (tentativeGScore >= gScore.get(neighbor)) {
+            for (GameState neighbor : current.generateChildren()) {
+                if (closedList.contains(neighbor)) {
                     continue;
                 }
 
-                gScore.put(neighbor, tentativeGScore);
-                fScore.put(neighbor, (gScore.get(neighbor)+ neighbor.heuristic()));
+                if (!priorityQueue.contains(neighbor)) {
+                    priorityQueue.add(neighbor);
+                }
             }
+
+            closedList.add(current);
         }
 
         // return an empty path

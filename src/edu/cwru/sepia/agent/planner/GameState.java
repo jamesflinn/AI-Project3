@@ -251,13 +251,7 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        if (this.getCost() > o.getCost()) {
-            return 1;
-        } else if (this.getCost() < o.getCost()) {
-            return -1;
-        } else {
-            return 0;
-        }
+        return (int) (this.heuristic() - o.heuristic());
     }
 
     @Override
