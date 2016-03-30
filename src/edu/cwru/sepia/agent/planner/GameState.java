@@ -188,10 +188,11 @@ public class GameState implements Comparable<GameState> {
         }
 
         List<List<StripsAction>> combinedActions = cartesianProduct(allPeasantActions);
+        System.out.println(combinedActions);
 
         for (List<StripsAction> combinedAction : combinedActions) {
             ParallelAction parallelAction = new ParallelAction(combinedAction);
-            parallelAction.apply(this);
+            children.add(parallelAction.apply(this));
         }
 
         return children;
