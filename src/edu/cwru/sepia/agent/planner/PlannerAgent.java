@@ -97,16 +97,17 @@ public class PlannerAgent extends Agent {
         Queue<GameState> priorityQueue = new PriorityQueue<>();
         Set<GameState> closedList = new HashSet<>();
 
+        Map<GameState, Double> gScore = new HashMap<>();
+
         priorityQueue.add(startState);
+        gScore.put(startState, 0.0);
 
         while (!priorityQueue.isEmpty()) {
             GameState current = priorityQueue.poll();
 
             if (current.isGoal()) {
                 System.out.println("Found goal!");
-                long endTime = System.nanoTime();
-                long duration = (endTime - startTime) / 1000000;
-                System.out.println("A* took " + duration + "ms to complete.");
+                System.out.println("A* took " + (System.nanoTime() - startTime) / 1000000 + "ms to complete.");
                 return current.getPreviousActions();
             }
 
@@ -115,8 +116,10 @@ public class PlannerAgent extends Agent {
                     continue;
                 }
 
-                if (!priorityQueue.contains(neighbor)) {
+                double newCost = gScore.get(current) + neighbor.getCost();
+                if (!gScore.containsKey(neighbor) || newCost < gScore.get(neighbor)) {
                     priorityQueue.add(neighbor);
+                    gScore.put(neighbor, newCost);
                 }
             }
 

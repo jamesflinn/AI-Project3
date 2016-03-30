@@ -231,16 +231,16 @@ public class GameState implements Comparable<GameState> {
      *
      * @return The current cost to reach this goal
      */
-        public double getCost() {
-            StripsAction previousAction = previousActions.peek();
+    public double getCost() {
+        StripsAction previousAction = previousActions.peek();
 
-            if (previousAction instanceof MoveAction) {
-                MoveAction moveAction = (MoveAction) previousAction;
-                return moveAction.getCurrentPosition().chebyshevDistance(moveAction.getTargetPosition());
-            } else {
-                return 1;
-            }
+        if (previousAction instanceof MoveAction) {
+            MoveAction moveAction = (MoveAction) previousAction;
+            return moveAction.getCurrentPosition().chebyshevDistance(moveAction.getTargetPosition());
+        } else {
+            return 1;
         }
+    }
 
     /**
      * This is necessary to use your state in the Java priority queue. See the official priority queue and Comparable
