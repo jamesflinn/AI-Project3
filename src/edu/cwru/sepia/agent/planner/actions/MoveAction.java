@@ -17,10 +17,15 @@ public class MoveAction implements StripsAction {
     private Position currentPosition;
     private Position targetPosition;
 
-    public MoveAction(int peasantID, Position currentPosition, Position targetPosition) {
+    private int xExtent;
+    private int yExtent;
+
+    public MoveAction(int peasantID, Position currentPosition, Position targetPosition, int xExtent, int yExtent) {
         this.peasantID = peasantID;
         this.currentPosition = currentPosition;
         this.targetPosition = targetPosition;
+        this.xExtent = xExtent;
+        this.yExtent = yExtent;
     }
 
     /**
@@ -32,8 +37,7 @@ public class MoveAction implements StripsAction {
     @Override
     public boolean preconditionsMet(GameState state) {
         Peasant peasant = state.getPeasant(peasantID);
-        return peasant.getPosition().equals(currentPosition) &&
-                !state.getPeasantsMap().values().stream().anyMatch((p) -> p.getPosition().equals(targetPosition));
+        return peasant.getPosition().equals(currentPosition) && targetPosition.inBounds(xExtent, yExtent);
     }
 
     /**
@@ -70,11 +74,6 @@ public class MoveAction implements StripsAction {
 
     public Position getTargetPosition() {
         return targetPosition;
-    }
-
-
-    public boolean isAdjacent(Position targetPosition, Position currentPosition) {
-        return Math.abs(targetPosition.x - currentPosition.x) <= 1 && Math.abs(targetPosition.y - currentPosition.y) <= 1;
     }
 
     @Override

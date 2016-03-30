@@ -93,6 +93,7 @@ public class PlannerAgent extends Agent {
      */
     private Stack<StripsAction> AstarSearch(GameState startState) {
         System.out.println("Inside AStar");
+        long startTime = System.nanoTime();
         // TODO: Make open/closed sets HashSets
         List<GameState> closedSet = new ArrayList<>();
         List<GameState> openSet = new ArrayList<>();
@@ -121,6 +122,10 @@ public class PlannerAgent extends Agent {
             // goal node is found, return path
             if (current.isGoal()) {
                 System.out.println(" GOAL FOUND!!!!!!!!!!!!!!!!!!!!");
+
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime) / 1000000;
+                System.out.println("A* took " + duration + "ms to complete.");
                 return current.getPreviousActions();
             }
 
