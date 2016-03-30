@@ -1,9 +1,6 @@
 package edu.cwru.sepia.agent.planner;
 
-import edu.cwru.sepia.agent.planner.actions.DepositAction;
-import edu.cwru.sepia.agent.planner.actions.HarvestAction;
-import edu.cwru.sepia.agent.planner.actions.MoveAction;
-import edu.cwru.sepia.agent.planner.actions.StripsAction;
+import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
@@ -142,10 +139,14 @@ public class GameState implements Comparable<GameState> {
      */
     public List<GameState> generateChildren() {
         List<GameState> children = new ArrayList<>();
+        List<List<StripsAction>> allPeasantActions = new ArrayList<>();
+
         for (Peasant peasant : peasants.values()) {
+            List<StripsAction> peasantActions = new ArrayList<>();
+
             HarvestAction harvestAction = new HarvestAction(peasant.getID());
             if (harvestAction.preconditionsMet(this)) {
-                children.add(harvestAction.apply(this));
+                peasantActions.add(harvestAction);
             }
 
 
@@ -153,13 +154,13 @@ public class GameState implements Comparable<GameState> {
                 // Move to townhall
                 MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), townhall), xExtent, yExtent);
                 if (moveAction.preconditionsMet(this)) {
-                    children.add(moveAction.apply(this));
+                    peasantActions.add(moveAction);
                 }
 
                 // Deposit resources
                 DepositAction depositAction = new DepositAction(peasant.getID());
                 if (depositAction.preconditionsMet(this)) {
-                    children.add(depositAction.apply(this));
+                    peasantActions.add(depositAction);
                 }
             } else if (!peasant.isCarrying() && peasant.getPosition().isAdjacent(townhall)){
                 // Move to all resource locations
@@ -167,7 +168,7 @@ public class GameState implements Comparable<GameState> {
                     for (ResourceLocation resource : goldLocations) {
                         MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()), xExtent, yExtent);
                         if (moveAction.preconditionsMet(this)) {
-                            children.add(moveAction.apply(this));
+                            peasantActions.add(moveAction);
                         }
                     }
                 }
@@ -176,11 +177,21 @@ public class GameState implements Comparable<GameState> {
                     for (ResourceLocation resource : treeLocations) {
                         MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), resource.getPosition()), xExtent, yExtent);
                         if (moveAction.preconditionsMet(this)) {
-                            children.add(moveAction.apply(this));
+                            peasantActions.add(moveAction);
                         }
                     }
                 }
             }
+
+            // Add all of this peasant's actions to the list of all peasant's actions.
+            allPeasantActions.add(peasantActions);
+        }
+
+        List<List<StripsAction>> combinedActions = cartesianProduct(allPeasantActions);
+
+        for (List<StripsAction> combinedAction : combinedActions) {
+            ParallelAction parallelAction = new ParallelAction(combinedAction);
+            parallelAction.apply(this);
         }
 
         return children;
@@ -377,6 +388,14 @@ public class GameState implements Comparable<GameState> {
         return closestResourcePosition;
     }
 
+    /**
+     * Given a start and end position, finds a new position such that the it is adjacent to end and
+     * closest to the start position.
+     *
+     * @param start The start position
+     * @param end   The end position
+     * @return The closest adjacent position to start
+     */
     private Position getClosestAdjacentPosition(Position start, Position end) {
         List<Position> adjacentPositions = end.getAdjacentPositions();
         Position closestAdjacentPosition = new Position(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -390,5 +409,31 @@ public class GameState implements Comparable<GameState> {
         }
 
         return closestAdjacentPosition;
+    }
+
+    /**
+     * Finds the cartesian product of each units's actions
+     *
+     * @param actionsList A list of each unit's actions
+     * @return The cartesian product of actions
+     */
+    private List<List<StripsAction>> cartesianProduct(List<List<StripsAction>> actionsList) {
+        List<List<StripsAction>> combinations = new ArrayList<>();
+        for (List<StripsAction> actions : actionsList) {
+            List<List<StripsAction>> extraColumnCombinations = new ArrayList<>();
+            for (StripsAction action : actions) {
+                if (combinations.isEmpty()) {
+                    extraColumnCombinations.add(Collections.singletonList(action));
+                } else {
+                    for (List<StripsAction> productList : combinations) {
+                        List<StripsAction> newProductList = new ArrayList<>(productList);
+                        newProductList.add(action);
+                        extraColumnCombinations.add(newProductList);
+                    }
+                }
+            }
+            combinations = extraColumnCombinations;
+        }
+        return combinations;
     }
 }
