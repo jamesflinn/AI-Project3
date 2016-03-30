@@ -99,10 +99,8 @@ public class PlannerAgent extends Agent {
         List<GameState> openSet = new ArrayList<>();
 
         openSet.add(startState);
-        List<GameState> exploredPrev = new ArrayList<>();
 
         HashMap<GameState, Double> fScore = new HashMap<>();
-        HashMap<GameState, GameState> explored = new HashMap<>();
         HashMap<GameState, Double> gScore = new HashMap<>();
 
         GameState current = startState;
@@ -110,18 +108,18 @@ public class PlannerAgent extends Agent {
         gScore.put(current, 0.0);                               // initial cost of optimal path
 
         while (!openSet.isEmpty()) {
-
-            GameState smallest = openSet.get(0);
             // finding node with smallest fScore value
+            GameState smallest = openSet.get(0);
             for (GameState loc : openSet) {
                 if (fScore.get(loc) < fScore.get(smallest)) {
                     smallest = loc;
                 }
             }
             current = smallest;
+
             // goal node is found, return path
             if (current.isGoal()) {
-                System.out.println(" GOAL FOUND!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("GOAL FOUND!!!!!!!!!!!!!!!!!!!!");
 
                 long endTime = System.nanoTime();
                 long duration = (endTime - startTime) / 1000000;
@@ -132,12 +130,13 @@ public class PlannerAgent extends Agent {
             // finished with the current node, so move it from Open to Closed
             openSet.remove(current);
             closedSet.add(current);
-            //examine the current nodes neighbors for the next most valid candidate
-            //examines all neighbor nodes that aren't closed or resources
+
+            // examine the current nodes neighbors for the next most valid candidate
+            // examines all neighbor nodes that aren't closed or resources
             List<GameState> neighbors = current.generateChildren().stream().filter((c) -> !closedSet.contains(c)).collect(Collectors.toList());
             for (GameState neighbor : neighbors) {
 
-                    if (gScore.get(neighbor) == null) {
+                if (gScore.get(neighbor) == null) {
                     //gScore not found yet, initialize to VERY big
                     gScore.put(neighbor, Double.MAX_VALUE);
                 }
@@ -152,9 +151,6 @@ public class PlannerAgent extends Agent {
                     continue;
                 }
 
-                exploredPrev.add(neighbor);
-                //use map instead of array to show explored from
-                explored.put(neighbor, current);
                 gScore.put(neighbor, tentativeGScore);
                 fScore.put(neighbor, (gScore.get(neighbor)+ neighbor.heuristic()));
             }
