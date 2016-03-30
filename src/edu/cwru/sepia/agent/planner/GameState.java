@@ -149,12 +149,14 @@ public class GameState implements Comparable<GameState> {
 
             if (peasant.isCarrying()) {
                 // Move to townhall
+                // TODO: Change so peasant moves to closest adjacent side of townhall
                 MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), new Position(townhall.x, townhall.y - 1));
                 if (moveAction.preconditionsMet(this)) {
                     children.add(moveAction.apply(this));
                 }
             } else {
                 // Move to all resource locations
+                // TODO: Change so peasant moves to closest adjacent side of resource
                 for (ResourceLocation resource : getAllResourceLocations()) {
                     MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), new Position(resource.getPosition().x, resource.getPosition().y - 1));
                     if (moveAction.preconditionsMet(this)) {

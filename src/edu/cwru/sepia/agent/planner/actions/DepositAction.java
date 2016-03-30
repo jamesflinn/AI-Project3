@@ -70,4 +70,12 @@ public class DepositAction implements StripsAction {
     public Direction getTownhallDirection() {
         return townhallDirection;
     }
+
+    @Override
+    public String toString() {
+        return "DepositAction{" +
+                "peasantID=" + peasantID +
+                ", townhallDirection=" + townhallDirection +
+                '}';
+    }
 }

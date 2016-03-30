@@ -103,4 +103,12 @@ public class HarvestAction implements StripsAction {
     public Direction getResourceDirection() {
         return resourceDirection;
     }
+
+    @Override
+    public String toString() {
+        return "HarvestAction{" +
+                "peasantID=" + peasantID +
+                ", resourceDirection=" + resourceDirection +
+                '}';
+    }
 }

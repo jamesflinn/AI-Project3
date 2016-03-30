@@ -1,6 +1,8 @@
 package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.action.ActionFeedback;
+import edu.cwru.sepia.action.ActionResult;
 import edu.cwru.sepia.agent.Agent;
 import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.history.History;
@@ -11,7 +13,10 @@ import edu.cwru.sepia.environment.model.state.Unit;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * This is an outline of the PEAgent. Implement the provided methods. You may add your own methods and members.
@@ -28,15 +33,12 @@ public class PEAgent extends Agent {
     private int townhallId;
     private int peasantTemplateId;
 
+    private StripsAction previousExecutedAction = null;
+
     public PEAgent(int playernum, Stack<StripsAction> plan) {
         super(playernum);
         peasantIdMap = new HashMap<Integer, Integer>();
-        List<StripsAction> stackList = new ArrayList<>(plan);
-        Stack<StripsAction> reversePlan = new Stack<StripsAction>();
-        for(int i = stackList.size()-1; i>=0;i--){
-            reversePlan.push(stackList.get(i));
-        }
-        this.plan = reversePlan;
+        this.plan = plan;
 
     }
 
@@ -97,9 +99,12 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
-        Action action = createSepiaAction(plan.pop());
-        System.out.println("Current action:"+action.toString());
-        actionMap.put(action.getUnitId(), action);
+        if (isActionComplete(stateView, historyView)) {
+            previousExecutedAction = plan.pop();
+            Action action = createSepiaAction(previousExecutedAction);
+            actionMap.put(action.getUnitId(), action);
+        }
+
 
         return actionMap;
     }
@@ -122,6 +127,31 @@ public class PEAgent extends Agent {
         }
 
         return null;
+    }
+
+    private boolean isActionComplete(State.StateView stateView, History.HistoryView historyView) {
+        if (previousExecutedAction == null) {
+            return true;
+        }
+
+        if (previousExecutedAction instanceof MoveAction) {
+            Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
+            for (ActionResult result : actionResults.values()) {
+                if (result.getFeedback() == ActionFeedback.COMPLETED) {
+                    return true;
+                }
+            }
+        } else {
+            for (int peasantId : peasantIdMap.keySet()) {
+                if (stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeAction() != null) {
+                    return stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeProgress() >= 1;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

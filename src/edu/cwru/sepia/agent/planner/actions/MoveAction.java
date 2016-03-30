@@ -76,4 +76,13 @@ public class MoveAction implements StripsAction {
     public boolean isAdjacent(Position targetPosition, Position currentPosition) {
         return Math.abs(targetPosition.x - currentPosition.x) <= 1 && Math.abs(targetPosition.y - currentPosition.y) <= 1;
     }
+
+    @Override
+    public String toString() {
+        return "MoveAction{" +
+                "peasantID=" + peasantID +
+                ", currentPosition=" + currentPosition +
+                ", targetPosition=" + targetPosition +
+                '}';
+    }
 }
