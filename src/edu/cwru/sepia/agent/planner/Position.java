@@ -169,12 +169,12 @@ public class Position {
         else if(position.x<x && position.y>y){
             return Direction.NORTHWEST;
         }
-        else /**if(position.x>x && position.y <y)**/{
-            return Direction.SOUTHEAST;
-        }
+//        else /**if(position.x>x && position.y <y)**/{
+//            return Direction.SOUTHEAST;
+//        }
 
-        //System.err.println("Position not adjacent. Could not determine direction");
-        //return Direction;
+        System.err.println("Position not adjacent. Could not determine direction. " + this.toString() + " -> " + position.toString());
+        return null;
     }
 
     /**
