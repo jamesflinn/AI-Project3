@@ -23,6 +23,12 @@ public class BuildPeasantAction implements StripsAction {
         return state.getCurrentGold() >= 400 && state.getPeasantsMap().size() < 3;
     }
 
+    /**
+     * Creates a new state such that there is an additional peasant, and that the player has 400 less gold.
+     *
+     * @param state State to apply action to
+     * @return A new GameState with an additional peasant.
+     */
     @Override
     public GameState apply(GameState state) {
         int newID = state.getPeasantsMap().size() + 1;
@@ -35,6 +41,6 @@ public class BuildPeasantAction implements StripsAction {
         Stack<StripsAction> actions = (Stack<StripsAction>) state.getPreviousActions().clone();
         actions.push(this);
 
-        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold(), state.getCurrentWood(), actions);
+        return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold() - 400, state.getCurrentWood(), actions);
     }
 }

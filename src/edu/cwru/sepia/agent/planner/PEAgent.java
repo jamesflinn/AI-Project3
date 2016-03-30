@@ -6,7 +6,6 @@ import edu.cwru.sepia.action.ActionResult;
 import edu.cwru.sepia.agent.Agent;
 import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.history.History;
-import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Template;
 import edu.cwru.sepia.environment.model.state.Unit;
@@ -126,6 +125,8 @@ public class PEAgent extends Agent {
         } else if (action instanceof DepositAction) {
             DepositAction depositAction = (DepositAction) action;
             return Action.createPrimitiveDeposit(depositAction.getPeasantID(), depositAction.getTownhallDirection());
+        } else if (action instanceof BuildPeasantAction) {
+            return Action.createPrimitiveProduction(townhallId, peasantTemplateId);
         }
 
         return null;
@@ -143,14 +144,12 @@ public class PEAgent extends Agent {
                     return true;
                 }
             }
-        } else {
+        } else if (previousExecutedAction instanceof DepositAction || previousExecutedAction instanceof HarvestAction) {
             for (int peasantId : peasantIdMap.keySet()) {
-                if (stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeAction() != null) {
-                    return stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeProgress() >= 1;
-                } else {
-                    return true;
-                }
+                return stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeAction() == null || stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeProgress() <= 1;
             }
+        } else {
+            return stateView.getUnit(townhallId).getCurrentDurativeAction() == null || stateView.getUnit(townhallId).getCurrentDurativeProgress() <= 1;
         }
 
         return false;

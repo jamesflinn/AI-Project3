@@ -94,6 +94,7 @@ public class PlannerAgent extends Agent {
     private Stack<StripsAction> AstarSearch(GameState startState) {
         System.out.println("Inside AStar");
         long startTime = System.nanoTime();
+
         // TODO: Make open/closed sets HashSets
         List<GameState> closedSet = new ArrayList<>();
         List<GameState> openSet = new ArrayList<>();

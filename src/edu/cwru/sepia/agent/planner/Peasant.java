@@ -75,12 +75,4 @@ public class Peasant {
     public ResourceNode.Type getResourceType() {
         return resourceType;
     }
-
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    public void setCarrying(boolean carrying) {
-        isCarrying = carrying;
-    }
 }
