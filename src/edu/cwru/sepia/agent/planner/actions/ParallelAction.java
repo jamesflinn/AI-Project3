@@ -3,6 +3,7 @@ package edu.cwru.sepia.agent.planner.actions;
 import edu.cwru.sepia.agent.planner.GameState;
 
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Represents a parallel action.
@@ -39,6 +40,18 @@ public class ParallelAction implements StripsAction {
         for (StripsAction action : actions) {
             newState = action.apply(newState);
         }
+
+        Stack<StripsAction> actions = (Stack<StripsAction>) state.getPreviousActions().clone();
+        actions.push(this);
+
+        newState = new GameState(newState, newState.getGoldLocations(), newState.getTreeLocations(), state.getPeasantsMap(), state.getCurrentGold(), state.getCurrentWood(), actions);
         return newState;
+    }
+
+    @Override
+    public String toString() {
+        return "ParallelAction{" +
+                "actions=" + actions +
+                '}';
     }
 }

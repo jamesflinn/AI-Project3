@@ -141,6 +141,11 @@ public class GameState implements Comparable<GameState> {
         List<GameState> children = new ArrayList<>();
         List<List<StripsAction>> allPeasantActions = new ArrayList<>();
 
+        BuildPeasantAction buildPeasantAction = new BuildPeasantAction();
+        if (buildPeasants && buildPeasantAction.preconditionsMet(this)) {
+            allPeasantActions.add(Arrays.asList(buildPeasantAction));
+        }
+
         for (Peasant peasant : peasants.values()) {
             List<StripsAction> peasantActions = new ArrayList<>();
 
@@ -188,7 +193,6 @@ public class GameState implements Comparable<GameState> {
         }
 
         List<List<StripsAction>> combinedActions = cartesianProduct(allPeasantActions);
-        System.out.println(combinedActions);
 
         for (List<StripsAction> combinedAction : combinedActions) {
             ParallelAction parallelAction = new ParallelAction(combinedAction);

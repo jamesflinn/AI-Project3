@@ -100,12 +100,18 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
+        // for each action in parallel action
+        // -check if that action is completed
+        // -if that action is completed, create a sepia action
+        // -put action in actionMap
+
+        System.out.println(plan);
+
         if (isActionComplete(stateView, historyView)) {
             previousExecutedAction = plan.pop();
             Action action = createSepiaAction(previousExecutedAction);
             actionMap.put(action.getUnitId(), action);
         }
-
 
         return actionMap;
     }
