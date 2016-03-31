@@ -178,7 +178,7 @@ public class GameState implements Comparable<GameState> {
             if (peasant.isCarrying()) {
                 // Move to townhall
                 MoveAction moveAction = new MoveAction(peasant.getID(), peasant.getPosition(), getClosestAdjacentPosition(peasant.getPosition(), townhall), xExtent, yExtent);
-                if (moveAction.preconditionsMet(this)) {
+                if (moveAction.preconditionsMet(this) && !peasant.getPosition().isAdjacent(townhall)) {
                     peasantActions.add(moveAction);
                 }
 

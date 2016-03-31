@@ -176,19 +176,19 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
+        System.out.println("\n\n\n=====MIDDLE STEP======");
+
         List<BirthLog> logs = historyView.getBirthLogs(stateView.getTurnNumber()-1);
         if (logs.size() > 0) {
-            System.out.println("BIRTH!!!!!!!!");
             BirthLog log = logs.get(logs.size() - 1);
-            System.out.println(String.format("This is the new birth log unitId: %d ", log.getNewUnitID()));
             peasantIdMap.put(getActivatedPeasantId(), log.getNewUnitID());
         }
 
         for (Integer peasantID : peasantActionMap.keySet()) {
             Stack<StripsAction> actionStack = peasantActionMap.get(peasantID);
             if (isPeasantActivatedMap.get(peasantID) && isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
+                // There is a one turn gap where the new unit doesn't show up.
                 if (!peasantIdMap.containsKey(peasantID)) {
-                    System.out.println(peasantID + " cannot be found in the peasantIdMap");
                     continue;
                 }
 
@@ -200,6 +200,7 @@ public class PEAgent extends Agent {
                     continue;
                 }
 
+                System.out.println("Performing " + stripsAction);
                 previousActionMap.put(findIdByAction(stripsAction), stripsAction);
                 Action action = createSepiaAction(stripsAction);
                 actionMap.put(action.getUnitId(), action);
