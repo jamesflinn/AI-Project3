@@ -194,7 +194,7 @@ public class PEAgent extends Agent {
 
                 StripsAction stripsAction = actionStack.pop();
 
-                if (!stripsAction.preconditionsMet(getCurrentGameState(stateView))) {
+                if (stripsAction instanceof BuildPeasantAction && !stripsAction.preconditionsMet(getCurrentGameState(stateView))) {
                     System.out.println(stripsAction + " cannot be done right now!");
                     actionStack.push(stripsAction);
                     continue;
