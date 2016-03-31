@@ -237,19 +237,21 @@ public class GameState implements Comparable<GameState> {
                 heuristic += 2 * (distanceToTownhall * (tripsGold - 1)) + distanceToTownhall;
             } else {
                 int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.GOLD_MINE));
-                heuristic += 2 * distanceToResource * tripsWood;
+                heuristic += 2 * distanceToResource * tripsGold;
             }
         }
 
         for (Peasant peasant : peasants.values()) {
             if (peasant.isCarrying() && peasant.getResourceType().equals(ResourceNode.Type.TREE)) {
                 int distanceToTownhall= peasant.getPosition().chebyshevDistance(townhall);
-                heuristic += 2 * (distanceToTownhall * (tripsGold - 1)) + distanceToTownhall;
+                heuristic += 2 * (distanceToTownhall * (tripsWood - 1)) + distanceToTownhall;
             } else {
                 int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.TREE));
                 heuristic += 2 * distanceToResource * tripsWood;
             }
         }
+
+        heuristic /= peasants.values().size();
 
         return heuristic;
     }

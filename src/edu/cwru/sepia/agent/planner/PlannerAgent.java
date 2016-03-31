@@ -117,10 +117,14 @@ public class PlannerAgent extends Agent {
                     continue;
                 }
 
-                double newCost = gScore.get(current) + neighbor.getCost();
-                if (!gScore.containsKey(neighbor) || newCost < gScore.get(neighbor)) {
+//                double newCost = gScore.get(current) + neighbor.getCost();
+//                if (!gScore.containsKey(neighbor) || newCost < gScore.get(neighbor)) {
+//                    priorityQueue.add(neighbor);
+//                    gScore.put(neighbor, newCost);
+//                }
+
+                if (!priorityQueue.contains(neighbor)) {
                     priorityQueue.add(neighbor);
-                    gScore.put(neighbor, newCost);
                 }
             }
 
