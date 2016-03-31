@@ -31,10 +31,9 @@ public class PEAgent extends Agent {
     private int townhallId;
     private int peasantTemplateId;
 
-    private StripsAction previousExecutedAction = null;
-
     // Maps peasant ids to their respective action stack
     private Map<Integer, Stack<StripsAction>> peasantActionMap;
+    private Map<Integer, StripsAction> previousActionMap;
 
     public PEAgent(int playernum, Stack<StripsAction> plan) {
         super(playernum);
@@ -110,10 +109,8 @@ public class PEAgent extends Agent {
             }
         }
 
-        // Stacks were inserted in reverse order, must fix them TODO: May not actually need to be done
-//        peasantActionMap.values().forEach(Collections::reverse);
-
         this.peasantActionMap = peasantActionMap;
+        this.previousActionMap = new HashMap<>();
 
         return middleStep(stateView, historyView);
     }
@@ -172,10 +169,14 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
-        if (isActionComplete(stateView, historyView)) {
-            previousExecutedAction = plan.pop();
-            Action action = createSepiaAction(previousExecutedAction);
-            actionMap.put(action.getUnitId(), action);
+        for (Integer peasantID : peasantActionMap.keySet()) {
+            Stack<StripsAction> actionStack = peasantActionMap.get(peasantID);
+            if (isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
+                StripsAction stripsAction = actionStack.pop();
+                previousActionMap.put(findIdByAction(stripsAction), stripsAction);
+                Action action = createSepiaAction(stripsAction);
+                actionMap.put(action.getUnitId(), action);
+            }
         }
 
         return actionMap;
@@ -203,19 +204,19 @@ public class PEAgent extends Agent {
         return null;
     }
 
-    private boolean isActionComplete(State.StateView stateView, History.HistoryView historyView) {
-        if (previousExecutedAction == null) {
+    private boolean isActionComplete(StripsAction action, State.StateView stateView, History.HistoryView historyView) {
+        if (action == null) {
             return true;
         }
 
-        if (previousExecutedAction instanceof MoveAction) {
+        if (action instanceof MoveAction) {
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
                 if (result.getFeedback() == ActionFeedback.COMPLETED) {
                     return true;
                 }
             }
-        } else if (previousExecutedAction instanceof DepositAction || previousExecutedAction instanceof HarvestAction) {
+        } else if (action instanceof DepositAction || action instanceof HarvestAction) {
             for (int peasantId : peasantIdMap.keySet()) {
                 return stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeAction() == null || stateView.getUnit(peasantIdMap.get(peasantId)).getCurrentDurativeProgress() <= 1;
             }
