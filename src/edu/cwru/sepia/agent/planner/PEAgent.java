@@ -246,7 +246,8 @@ public class PEAgent extends Agent {
         if (action instanceof MoveAction) {
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
-                if (result.getFeedback() == ActionFeedback.COMPLETED) {
+                int unitID = peasantIdMap.get(findIdByAction(action));
+                if (result.getAction().getUnitId() == unitID && result.getFeedback() == ActionFeedback.COMPLETED) {
                     return true;
                 }
             }
