@@ -25,7 +25,15 @@ public class ParallelAction implements StripsAction {
      */
     @Override
     public boolean preconditionsMet(GameState state) {
-        return actions.stream().allMatch(a -> a.preconditionsMet(state));
+        GameState newState = state;
+        for (StripsAction action : actions) {
+            if (action.preconditionsMet(newState)) {
+                newState = action.apply(newState);
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
