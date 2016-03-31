@@ -12,6 +12,9 @@ import java.util.Stack;
  * Created by jamesflinn on 3/29/16.
  */
 public class BuildPeasantAction implements StripsAction {
+
+    private int newID;
+
     /**
      * Preconditions are met if the player has at least 400 gold,
      * and if there are less than 3 peasants already in existance.
@@ -31,7 +34,7 @@ public class BuildPeasantAction implements StripsAction {
      */
     @Override
     public GameState apply(GameState state) {
-        int newID = state.getPeasantsMap().size() + 1;
+        newID = state.getPeasantsMap().size() + 1;
         Position newPosition = new Position(state.getTownhall().x + 1, state.getTownhall().y);
         Peasant newPeasant = new Peasant(newID, newPosition);
 
@@ -42,5 +45,9 @@ public class BuildPeasantAction implements StripsAction {
         actions.push(this);
 
         return new GameState(state, state.getGoldLocations(), state.getTreeLocations(), newPeasantMap, state.getCurrentGold() - 400, state.getCurrentWood(), actions);
+    }
+
+    public int getNewID() {
+        return newID;
     }
 }

@@ -19,6 +19,8 @@ import java.util.*;
  */
 public class PEAgent extends Agent {
 
+    private static final int MAX_PEASANTS = 3;
+
     // The plan being executed
     private Stack<StripsAction> plan = null;
 
@@ -66,26 +68,61 @@ public class PEAgent extends Agent {
             }
         }
 
-        Stack<StripsAction> peasant1 = new Stack<>();
-        Stack<StripsAction> peasant2 = new Stack<>();
-        Stack<StripsAction> peasant3 = new Stack<>();
+        List<Stack<StripsAction>> stackList = Arrays.asList(new Stack<>(), new Stack<>(), new Stack<>());
 
-        //peasantActionList.add(peasant1);
-        //peasantActionList.add(peasant2);
-        //peasantActionList.add(peasant3);
         int currentStackIndex = 1;
         for(StripsAction action : plan){
-            //figure out what type of action this is
-            //get ID from action
+            ParallelAction parallelAction = (ParallelAction) action;
 
-            ParallelAction parallelAction = (ParallelAction)action;
-            List<StripsAction> actionList = parallelAction.getActions();
-            currentStackIndex = actionList.size();
-            for(StripsAction peasantAction : actionList){
-                peasantID = peasantAction.g
+            // There must be a BuildPeasantAction!!!!!!!!
+            if (parallelAction.getActions().size() > currentStackIndex) {
+                for (StripsAction stripsAction : parallelAction.getActions()) {
+                    if (stripsAction instanceof BuildPeasantAction) {
+                        BuildPeasantAction buildPeasantAction = (BuildPeasantAction) stripsAction;
+                        stackList.get(currentStackIndex).push(buildPeasantAction);
+                        peasantActionMap.put(buildPeasantAction.getNewID(), stackList.get(currentStackIndex));
+                        currentStackIndex += 1;
+                    }
+                }
+            }
+
+            // For every action in parallelAction, add that action to the specific unit's action stack
+            for (StripsAction stripsAction : parallelAction.getActions()) {
+                // this was already dealt with, skip it
+                if (stripsAction instanceof BuildPeasantAction) {
+                    continue;
+                }
+
+                peasantActionMap.get(findIdByAction(stripsAction)).push(stripsAction);
+            }
+
+            // Push null before a peasant is built
+            for (int i = currentStackIndex; i < MAX_PEASANTS; i++) {
+                stackList.get(i).push(null);
             }
         }
         return middleStep(stateView, historyView);
+    }
+
+    /**
+     * Finds a unit's ID in the specified action
+     *
+     * @param action the StripsAction containing the ID
+     * @return the ID of the action
+     */
+    private int findIdByAction(StripsAction action) {
+        if (action instanceof MoveAction) {
+            MoveAction moveAction = (MoveAction) action;
+            return moveAction.getPeasantID();
+        } else if (action instanceof HarvestAction) {
+            HarvestAction harvestAction = (HarvestAction) action;
+            return harvestAction.getPeasantID();
+        } else if (action instanceof DepositAction) {
+            DepositAction depositAction = (DepositAction) action;
+            return depositAction.getPeasantID();
+        }
+
+        return -1;
     }
 
     /**
@@ -121,13 +158,7 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
-        // for each action in parallel action
-        // -check if that action is completed
-        // -if that action is completed, create a sepia action
-        // -put action in actionMap
-
         System.out.println(plan);
-
 
         if (isActionComplete(stateView, historyView)) {
             previousExecutedAction = plan.pop();
