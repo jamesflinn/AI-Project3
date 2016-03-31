@@ -44,7 +44,7 @@ public class ParallelAction implements StripsAction {
         Stack<StripsAction> actions = (Stack<StripsAction>) state.getPreviousActions().clone();
         actions.push(this);
 
-        newState = new GameState(newState, newState.getGoldLocations(), newState.getTreeLocations(), state.getPeasantsMap(), state.getCurrentGold(), state.getCurrentWood(), actions);
+        newState = new GameState(newState, newState.getGoldLocations(), newState.getTreeLocations(), newState.getPeasantsMap(), newState.getCurrentGold(), newState.getCurrentWood(), actions);
         return newState;
     }
 
@@ -53,5 +53,9 @@ public class ParallelAction implements StripsAction {
         return "ParallelAction{" +
                 "actions=" + actions +
                 '}';
+    }
+
+    public List<StripsAction> getActions() {
+        return actions;
     }
 }
