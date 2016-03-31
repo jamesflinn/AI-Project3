@@ -221,23 +221,18 @@ public class GameState implements Comparable<GameState> {
         int tripsLeft = tripsGold + tripsWood;
 
         //Setting 4 as the threshold for deciding whether peasants are necessary
-        if(tripsLeft < 4){
-            if(tripsLeft/peasants.size() >= 4){
-                heuristic = heuristic -1;
-            }
-        }
-        if(tripsLeft>4){
-            if(tripsLeft/peasants.size() <= tripsLeft/2 ){
-                heuristic = heuristic -1;
-            }
-        }
+
         for (Peasant peasant : peasants.values()) {
             if (peasant.isCarrying() && peasant.getResourceType().equals(ResourceNode.Type.GOLD_MINE)) {
                 int distanceToTownhall= peasant.getPosition().chebyshevDistance(townhall);
                 heuristic += 2 * (distanceToTownhall * (tripsGold - 1)) + distanceToTownhall;
+                if(requiredGold/2 > currentGold){
+                    heuristic = heuristic  / 2;
+                }
             } else {
                 int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.GOLD_MINE));
                 heuristic += 2 * distanceToResource * tripsGold;
+
             }
         }
 
@@ -245,6 +240,9 @@ public class GameState implements Comparable<GameState> {
             if (peasant.isCarrying() && peasant.getResourceType().equals(ResourceNode.Type.TREE)) {
                 int distanceToTownhall= peasant.getPosition().chebyshevDistance(townhall);
                 heuristic += 2 * (distanceToTownhall * (tripsWood - 1)) + distanceToTownhall;
+                if(requiredGold/2 > currentGold){
+                    heuristic = heuristic * 2;
+                }
             } else {
                 int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.TREE));
                 heuristic += 2 * distanceToResource * tripsWood;
