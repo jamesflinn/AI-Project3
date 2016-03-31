@@ -33,6 +33,7 @@ public class PEAgent extends Agent {
 
     // Maps peasant ids to their respective action stack
     private Map<Integer, Stack<StripsAction>> peasantActionMap;
+    private Map<Integer, Boolean> isPeasantActivatedMap;
     private Map<Integer, StripsAction> previousActionMap;
 
     public PEAgent(int playernum, Stack<StripsAction> plan) {
@@ -71,11 +72,13 @@ public class PEAgent extends Agent {
         }
 
         List<Stack<StripsAction>> stackList = Arrays.asList(new Stack<>(), new Stack<>(), new Stack<>());
+        this.isPeasantActivatedMap = new HashMap<>();
 
         // The first parallel action will always only have one peasant. Initialize that peasant in the peasantActionMap
         StripsAction firstAction = plan.peek();
         ParallelAction firstParallelAction = (ParallelAction) firstAction;
         peasantActionMap.put(findIdByAction(firstParallelAction.getActions().get(0)), stackList.get(0));
+        isPeasantActivatedMap.put(findIdByAction(firstParallelAction.getActions().get(0)), true);
 
         int currentStackIndex = 1;
         for(StripsAction action : plan){
@@ -86,8 +89,9 @@ public class PEAgent extends Agent {
                 for (StripsAction stripsAction : parallelAction.getActions()) {
                     if (stripsAction instanceof BuildPeasantAction) {
                         BuildPeasantAction buildPeasantAction = (BuildPeasantAction) stripsAction;
-                        stackList.get(currentStackIndex).push(buildPeasantAction);
+                        stackList.get(currentStackIndex - 1).push(buildPeasantAction); // push the build peasant action on the previous peasant's stack
                         peasantActionMap.put(buildPeasantAction.getNewID(), stackList.get(currentStackIndex));
+                        isPeasantActivatedMap.put(buildPeasantAction.getNewID(), false);
                         currentStackIndex += 1;
                     }
                 }
@@ -111,6 +115,7 @@ public class PEAgent extends Agent {
 
         this.peasantActionMap = peasantActionMap;
         this.previousActionMap = new HashMap<>();
+
 
         return middleStep(stateView, historyView);
     }
@@ -171,7 +176,7 @@ public class PEAgent extends Agent {
 
         for (Integer peasantID : peasantActionMap.keySet()) {
             Stack<StripsAction> actionStack = peasantActionMap.get(peasantID);
-            if (isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
+            if (isPeasantActivatedMap.get(peasantID) && isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
                 StripsAction stripsAction = actionStack.pop();
                 previousActionMap.put(findIdByAction(stripsAction), stripsAction);
                 Action action = createSepiaAction(stripsAction);
@@ -199,6 +204,8 @@ public class PEAgent extends Agent {
             DepositAction depositAction = (DepositAction) action;
             return Action.createPrimitiveDeposit(depositAction.getPeasantID(), depositAction.getTownhallDirection());
         } else if (action instanceof BuildPeasantAction) {
+            BuildPeasantAction buildPeasantAction = (BuildPeasantAction) action;
+            isPeasantActivatedMap.put(buildPeasantAction.getNewID(), true);
             return Action.createPrimitiveProduction(townhallId, peasantTemplateId);
         }
 
