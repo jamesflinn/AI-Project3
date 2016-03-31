@@ -45,6 +45,8 @@ public class PEAgent extends Agent {
 
     @Override
     public Map<Integer, Action> initialStep(State.StateView stateView, History.HistoryView historyView) {
+       Map<Integer, Stack<StripsAction>> peasantActionMap = new HashMap<>();
+
         // gets the townhall ID and the peasant ID
         for(int unitId : stateView.getUnitIds(playernum)) {
             Unit.UnitView unit = stateView.getUnit(unitId);
@@ -64,6 +66,25 @@ public class PEAgent extends Agent {
             }
         }
 
+        Stack<StripsAction> peasant1 = new Stack<>();
+        Stack<StripsAction> peasant2 = new Stack<>();
+        Stack<StripsAction> peasant3 = new Stack<>();
+
+        //peasantActionList.add(peasant1);
+        //peasantActionList.add(peasant2);
+        //peasantActionList.add(peasant3);
+        int currentStackIndex = 1;
+        for(StripsAction action : plan){
+            //figure out what type of action this is
+            //get ID from action
+
+            ParallelAction parallelAction = (ParallelAction)action;
+            List<StripsAction> actionList = parallelAction.getActions();
+            currentStackIndex = actionList.size();
+            for(StripsAction peasantAction : actionList){
+                peasantID = peasantAction.g
+            }
+        }
         return middleStep(stateView, historyView);
     }
 
@@ -106,6 +127,7 @@ public class PEAgent extends Agent {
         // -put action in actionMap
 
         System.out.println(plan);
+
 
         if (isActionComplete(stateView, historyView)) {
             previousExecutedAction = plan.pop();

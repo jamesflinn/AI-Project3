@@ -112,6 +112,7 @@ public class PlannerAgent extends Agent {
             }
 
             for (GameState neighbor : current.generateChildren()) {
+                //System.out.println("This is the neighbor:"+neighbor.toString());
                 if (closedList.contains(neighbor)) {
                     continue;
                 }
