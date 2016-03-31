@@ -174,6 +174,7 @@ public class PEAgent extends Agent {
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
+
         List<BirthLog> logs = historyView.getBirthLogs(stateView.getTurnNumber()-1);
         if(logs.size()>0){
             System.out.println("BIRTH!!!!!!!!");
@@ -181,12 +182,7 @@ public class PEAgent extends Agent {
             System.out.println(String.format("This is the new birth log unitId: %d ", log.getNewUnitID()));
             peasantIdMap.put(currentStackIndex, log.getNewUnitID());
         }
-        for(int i = 1; i <= currentStackIndex; i++) {
-            int newPeasantId = historyView.getBirthLogs(stateView.getTurnNumber() - 1).get(0).getNewUnitID();
-            if(peasantIdMap.containsValue(newPeasantId)){
-                peasantIdMap.put(currentStackIndex, newPeasantId);
-            }
-        }
+
         for (Integer peasantID : peasantActionMap.keySet()) {
             Stack<StripsAction> actionStack = peasantActionMap.get(peasantID);
             if (isPeasantActivatedMap.get(peasantID) && isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
@@ -208,13 +204,16 @@ public class PEAgent extends Agent {
     private Action createSepiaAction(StripsAction action) {
         if (action instanceof MoveAction) {
             MoveAction moveAction = (MoveAction) action;
-            return Action.createCompoundMove(moveAction.getPeasantID(), moveAction.getTargetPosition().x, moveAction.getTargetPosition().y);
+            int peasantID = peasantIdMap.get(moveAction.getPeasantID());
+            return Action.createCompoundMove(peasantID, moveAction.getTargetPosition().x, moveAction.getTargetPosition().y);
         } else if (action instanceof HarvestAction) {
             HarvestAction harvestAction = (HarvestAction) action;
-            return Action.createPrimitiveGather(harvestAction.getPeasantID(), harvestAction.getResourceDirection());
+            int peasantID = peasantIdMap.get(harvestAction.getPeasantID());
+            return Action.createPrimitiveGather(peasantID, harvestAction.getResourceDirection());
         } else if (action instanceof DepositAction) {
             DepositAction depositAction = (DepositAction) action;
-            return Action.createPrimitiveDeposit(depositAction.getPeasantID(), depositAction.getTownhallDirection());
+            int peasantID = peasantIdMap.get(depositAction.getPeasantID());
+            return Action.createPrimitiveDeposit(peasantID, depositAction.getTownhallDirection());
         } else if (action instanceof BuildPeasantAction) {
             BuildPeasantAction buildPeasantAction = (BuildPeasantAction) action;
             isPeasantActivatedMap.put(buildPeasantAction.getNewID(), true);
