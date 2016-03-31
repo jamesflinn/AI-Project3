@@ -45,7 +45,6 @@ public class HarvestAction implements StripsAction {
         Peasant oldPeasant = state.getPeasant(peasantID);
         ResourceLocation adjResource = findAdjResource(oldPeasant, state.getGoldLocations(), state.getTreeLocations());
         resourceDirection = oldPeasant.getPosition().getDirection(adjResource.getPosition());
-
         Peasant newPeasant = new Peasant(peasantID, oldPeasant.getPosition(), adjResource.getResourceType());
 
         List<ResourceLocation> newGoldLocations = new ArrayList<>(state.getGoldLocations());
@@ -57,8 +56,8 @@ public class HarvestAction implements StripsAction {
             addNewResourceToList(newTreeLocations, adjResource);
         }
 
-        Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
-        newPeasantMap.put(peasantID, newPeasant);
+            Map<Integer, Peasant> newPeasantMap = new HashMap<>(state.getPeasantsMap());
+            newPeasantMap.put(peasantID, newPeasant);
 
         Stack<StripsAction> actions = (Stack<StripsAction>) state.getPreviousActions().clone();
         actions.push(this);

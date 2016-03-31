@@ -5,6 +5,7 @@ import edu.cwru.sepia.action.ActionFeedback;
 import edu.cwru.sepia.action.ActionResult;
 import edu.cwru.sepia.agent.Agent;
 import edu.cwru.sepia.agent.planner.actions.*;
+import edu.cwru.sepia.environment.model.history.BirthLog;
 import edu.cwru.sepia.environment.model.history.History;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Template;
@@ -30,7 +31,7 @@ public class PEAgent extends Agent {
     private Map<Integer, Integer> peasantIdMap;
     private int townhallId;
     private int peasantTemplateId;
-
+    private int currentStackIndex;
     // Maps peasant ids to their respective action stack
     private Map<Integer, Stack<StripsAction>> peasantActionMap;
     private Map<Integer, Boolean> isPeasantActivatedMap;
@@ -82,7 +83,6 @@ public class PEAgent extends Agent {
         ParallelAction firstParallelAction = (ParallelAction) firstAction;
         peasantActionMap.put(findIdByAction(firstParallelAction.getActions().get(0)), stackList.get(0));
         isPeasantActivatedMap.put(findIdByAction(firstParallelAction.getActions().get(0)), true);
-
         int currentStackIndex = 1;
         for (StripsAction action : reversedPlan) {
             ParallelAction parallelAction = (ParallelAction) action;
@@ -174,7 +174,19 @@ public class PEAgent extends Agent {
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
-
+        List<BirthLog> logs = historyView.getBirthLogs(stateView.getTurnNumber()-1);
+        if(logs.size()>0){
+            System.out.println("BIRTH!!!!!!!!");
+            BirthLog log = logs.get(logs.size()-1);
+            System.out.println(String.format("This is the new birth log unitId: %d ", log.getNewUnitID()));
+            peasantIdMap.put(currentStackIndex, log.getNewUnitID());
+        }
+        for(int i = 1; i <= currentStackIndex; i++) {
+            int newPeasantId = historyView.getBirthLogs(stateView.getTurnNumber() - 1).get(0).getNewUnitID();
+            if(peasantIdMap.containsValue(newPeasantId)){
+                peasantIdMap.put(currentStackIndex, newPeasantId);
+            }
+        }
         for (Integer peasantID : peasantActionMap.keySet()) {
             Stack<StripsAction> actionStack = peasantActionMap.get(peasantID);
             if (isPeasantActivatedMap.get(peasantID) && isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
