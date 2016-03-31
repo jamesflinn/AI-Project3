@@ -176,16 +176,21 @@ public class PEAgent extends Agent {
         Map<Integer, Action> actionMap = new HashMap<>();
 
         List<BirthLog> logs = historyView.getBirthLogs(stateView.getTurnNumber()-1);
-        if(logs.size()>0){
+        if (logs.size() > 0) {
             System.out.println("BIRTH!!!!!!!!");
-            BirthLog log = logs.get(logs.size()-1);
+            BirthLog log = logs.get(logs.size() - 1);
             System.out.println(String.format("This is the new birth log unitId: %d ", log.getNewUnitID()));
-            peasantIdMap.put(currentStackIndex, log.getNewUnitID());
+            peasantIdMap.put(getActivatedPeasantId(), log.getNewUnitID());
         }
 
         for (Integer peasantID : peasantActionMap.keySet()) {
             Stack<StripsAction> actionStack = peasantActionMap.get(peasantID);
             if (isPeasantActivatedMap.get(peasantID) && isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
+                if (!peasantIdMap.containsKey(peasantID)) {
+                    System.out.println(peasantID + " cannot be found in the peasantIdMap");
+                    continue;
+                }
+
                 StripsAction stripsAction = actionStack.pop();
                 previousActionMap.put(findIdByAction(stripsAction), stripsAction);
                 Action action = createSepiaAction(stripsAction);
@@ -216,6 +221,7 @@ public class PEAgent extends Agent {
             return Action.createPrimitiveDeposit(peasantID, depositAction.getTownhallDirection());
         } else if (action instanceof BuildPeasantAction) {
             BuildPeasantAction buildPeasantAction = (BuildPeasantAction) action;
+            System.out.println("Build peasant action received!");
             isPeasantActivatedMap.put(buildPeasantAction.getNewID(), true);
             return Action.createPrimitiveProduction(townhallId, peasantTemplateId);
         }
@@ -244,6 +250,16 @@ public class PEAgent extends Agent {
         }
 
         return false;
+    }
+
+    private int getActivatedPeasantId() {
+        int count = 0;
+        for (boolean isActivated : isPeasantActivatedMap.values()) {
+            if (isActivated) {
+                count += 1;
+            }
+        }
+        return count;
     }
 
     @Override
