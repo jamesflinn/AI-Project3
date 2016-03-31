@@ -7,6 +7,7 @@ import edu.cwru.sepia.agent.Agent;
 import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.history.BirthLog;
 import edu.cwru.sepia.environment.model.history.History;
+import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Template;
 import edu.cwru.sepia.environment.model.state.Unit;
@@ -192,6 +193,13 @@ public class PEAgent extends Agent {
                 }
 
                 StripsAction stripsAction = actionStack.pop();
+
+                if (stripsAction instanceof BuildPeasantAction && !stripsAction.preconditionsMet(getCurrentGameState(stateView))) {
+                    System.out.println(stripsAction + " cannot be done right now!");
+                    actionStack.push(stripsAction);
+                    continue;
+                }
+
                 previousActionMap.put(findIdByAction(stripsAction), stripsAction);
                 Action action = createSepiaAction(stripsAction);
                 actionMap.put(action.getUnitId(), action);
@@ -260,6 +268,23 @@ public class PEAgent extends Agent {
             }
         }
         return count;
+    }
+
+    /**
+     * Generates the current state in the game
+     *
+     * @param stateView The current StateView
+     * @return the updated state
+     */
+    private GameState getCurrentGameState(State.StateView stateView) {
+        return new GameState(
+                stateView,
+                playernum,
+                1000,
+                1000,
+                stateView.getResourceAmount(playernum, ResourceType.GOLD),
+                stateView.getResourceAmount(playernum, ResourceType.WOOD),
+                true);
     }
 
     @Override

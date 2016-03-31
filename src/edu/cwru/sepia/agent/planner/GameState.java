@@ -2,6 +2,7 @@ package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
+import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit;
 
@@ -56,14 +57,18 @@ public class GameState implements Comparable<GameState> {
      * @param buildPeasants True if the BuildPeasant action should be considered
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
+        this(state, playernum, requiredGold, requiredWood, 0, 0, buildPeasants);
+    }
+
+    public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, int currentGold, int currentWood, boolean buildPeasants) {
         this.playerNum = playernum;
         this.xExtent = state.getXExtent();
         this.yExtent = state.getYExtent();
         this.buildPeasants = buildPeasants;
         this.requiredGold = requiredGold;
         this.requiredWood = requiredWood;
-        currentGold = 0;
-        currentWood = 0;
+        this.currentGold = currentGold;
+        this.currentWood = currentWood;
         goldLocations = new ArrayList<>();
         treeLocations = new ArrayList<>();
         peasants = new HashMap<>();
@@ -72,11 +77,13 @@ public class GameState implements Comparable<GameState> {
         for (ResourceNode.ResourceView resource : state.getAllResourceNodes()) {
             Position position = new Position(resource.getXPosition(), resource.getYPosition());
             if (resource.getType().equals(ResourceNode.Type.GOLD_MINE)) {
-                goldLocations.add(new ResourceLocation(position, ResourceNode.Type.GOLD_MINE,resource.getAmountRemaining()));
+                goldLocations.add(new ResourceLocation(position, ResourceNode.Type.GOLD_MINE, resource.getAmountRemaining()));
             } else if (resource.getType().equals(ResourceNode.Type.TREE)) {
-                treeLocations.add(new ResourceLocation(position, ResourceNode.Type.TREE,resource.getAmountRemaining()));
+                treeLocations.add(new ResourceLocation(position, ResourceNode.Type.TREE, resource.getAmountRemaining()));
             }
         }
+
+        int peasantNumber = 1;
 
         // add existing units
         for (Unit.UnitView unit : state.getUnits(playernum)) {
@@ -85,7 +92,20 @@ public class GameState implements Comparable<GameState> {
             if (unitType.equals("townhall")) {
                 townhall = new Position(unit.getXPosition(), unit.getYPosition());
             } else if (unitType.equals("peasant")) {
-                peasants.put(unit.getID(), new Peasant(unit.getID(), new Position(unit.getXPosition(), unit.getYPosition())));
+                if (unit.getCargoAmount() > 0) {
+
+                    ResourceNode.Type resourceType;
+                    if (unit.getCargoType().equals(ResourceType.GOLD)) {
+                        resourceType = ResourceNode.Type.GOLD_MINE;
+                    } else {
+                        resourceType = ResourceNode.Type.TREE;
+                    }
+                    peasants.put(peasantNumber, new Peasant(peasantNumber, new Position(unit.getXPosition(), unit.getYPosition()), resourceType));
+
+                } else {
+                    peasants.put(peasantNumber, new Peasant(peasantNumber, new Position(unit.getXPosition(), unit.getYPosition())));
+                }
+                peasantNumber += 1;
             }
         }
 
