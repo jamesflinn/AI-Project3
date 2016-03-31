@@ -37,6 +37,9 @@ public class MoveAction implements StripsAction {
     @Override
     public boolean preconditionsMet(GameState state) {
         Peasant peasant = state.getPeasant(peasantID);
+        if (peasant == null) {
+            System.out.println(state.getPeasantsMap());
+        }
         return peasant.getPosition().equals(currentPosition) && targetPosition.inBounds(xExtent, yExtent);
     }
 
