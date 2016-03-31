@@ -71,6 +71,9 @@ public class PEAgent extends Agent {
             }
         }
 
+        Stack<StripsAction> reversedPlan = (Stack<StripsAction>) plan.clone();
+        Collections.reverse(reversedPlan);
+
         List<Stack<StripsAction>> stackList = Arrays.asList(new Stack<>(), new Stack<>(), new Stack<>());
         this.isPeasantActivatedMap = new HashMap<>();
 
@@ -81,7 +84,7 @@ public class PEAgent extends Agent {
         isPeasantActivatedMap.put(findIdByAction(firstParallelAction.getActions().get(0)), true);
 
         int currentStackIndex = 1;
-        for(StripsAction action : plan){
+        for (StripsAction action : reversedPlan) {
             ParallelAction parallelAction = (ParallelAction) action;
 
             // There must be a BuildPeasantAction!!!!!!!!
@@ -106,16 +109,14 @@ public class PEAgent extends Agent {
 
                 peasantActionMap.get(findIdByAction(stripsAction)).push(stripsAction);
             }
+        }
 
-            // Push null before a peasant is built
-            for (int i = currentStackIndex; i < MAX_PEASANTS; i++) {
-                stackList.get(i).push(null);
-            }
+        for (Stack<StripsAction> stack : peasantActionMap.values()) {
+            Collections.reverse(stack);
         }
 
         this.peasantActionMap = peasantActionMap;
         this.previousActionMap = new HashMap<>();
-
 
         return middleStep(stateView, historyView);
     }

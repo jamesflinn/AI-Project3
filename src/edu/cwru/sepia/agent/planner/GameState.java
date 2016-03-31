@@ -196,7 +196,9 @@ public class GameState implements Comparable<GameState> {
 
         for (List<StripsAction> combinedAction : combinedActions) {
             ParallelAction parallelAction = new ParallelAction(combinedAction);
-            children.add(parallelAction.apply(this));
+            if (parallelAction.preconditionsMet(this)) {
+                children.add(parallelAction.apply(this));
+            }
         }
 
         return children;
