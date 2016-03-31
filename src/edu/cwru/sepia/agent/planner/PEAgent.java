@@ -33,6 +33,9 @@ public class PEAgent extends Agent {
 
     private StripsAction previousExecutedAction = null;
 
+    // Maps peasant ids to their respective action stack
+    private Map<Integer, Stack<StripsAction>> peasantActionMap;
+
     public PEAgent(int playernum, Stack<StripsAction> plan) {
         super(playernum);
         peasantIdMap = new HashMap<Integer, Integer>();
@@ -70,6 +73,11 @@ public class PEAgent extends Agent {
 
         List<Stack<StripsAction>> stackList = Arrays.asList(new Stack<>(), new Stack<>(), new Stack<>());
 
+        // The first parallel action will always only have one peasant. Initialize that peasant in the peasantActionMap
+        StripsAction firstAction = plan.peek();
+        ParallelAction firstParallelAction = (ParallelAction) firstAction;
+        peasantActionMap.put(findIdByAction(firstParallelAction.getActions().get(0)), stackList.get(0));
+
         int currentStackIndex = 1;
         for(StripsAction action : plan){
             ParallelAction parallelAction = (ParallelAction) action;
@@ -101,6 +109,12 @@ public class PEAgent extends Agent {
                 stackList.get(i).push(null);
             }
         }
+
+        // Stacks were inserted in reverse order, must fix them TODO: May not actually need to be done
+//        peasantActionMap.values().forEach(Collections::reverse);
+
+        this.peasantActionMap = peasantActionMap;
+
         return middleStep(stateView, historyView);
     }
 
@@ -157,8 +171,6 @@ public class PEAgent extends Agent {
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
-
-        System.out.println(plan);
 
         if (isActionComplete(stateView, historyView)) {
             previousExecutedAction = plan.pop();
