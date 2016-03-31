@@ -30,7 +30,7 @@ public class PEAgent extends Agent {
     private Map<Integer, Integer> peasantIdMap;
     private int townhallId;
     private int peasantTemplateId;
-
+    private int currentStackIndex;
     // Maps peasant ids to their respective action stack
     private Map<Integer, Stack<StripsAction>> peasantActionMap;
     private Map<Integer, Boolean> isPeasantActivatedMap;
@@ -80,7 +80,7 @@ public class PEAgent extends Agent {
         peasantActionMap.put(findIdByAction(firstParallelAction.getActions().get(0)), stackList.get(0));
         isPeasantActivatedMap.put(findIdByAction(firstParallelAction.getActions().get(0)), true);
 
-        int currentStackIndex = 1;
+        currentStackIndex = 1;
         for(StripsAction action : plan){
             ParallelAction parallelAction = (ParallelAction) action;
 
@@ -183,8 +183,12 @@ public class PEAgent extends Agent {
                 actionMap.put(action.getUnitId(), action);
             }
         }
-        int newPeasantId = historyView.getBirthLogs(stateView.getTurnNumber()-1).get(0).getNewUnitID();
-
+        for(int i = 1; i <= currentStackIndex; i++) {
+            int newPeasantId = historyView.getBirthLogs(stateView.getTurnNumber() - 1).get(0).getNewUnitID();
+            if(peasantIdMap.containsValue(newPeasantId)){
+                peasantIdMap.put(currentStackIndex, newPeasantId);
+            }
+        }
         return actionMap;
     }
 
