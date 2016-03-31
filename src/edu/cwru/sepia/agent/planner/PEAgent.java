@@ -178,6 +178,7 @@ public class PEAgent extends Agent {
                 actionMap.put(action.getUnitId(), action);
             }
         }
+        int newPeasantId = historyView.getBirthLogs(stateView.getTurnNumber()-1).get(0).getNewUnitID();
 
         return actionMap;
     }
