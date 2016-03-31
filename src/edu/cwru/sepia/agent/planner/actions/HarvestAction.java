@@ -45,7 +45,6 @@ public class HarvestAction implements StripsAction {
         Peasant oldPeasant = state.getPeasant(peasantID);
         ResourceLocation adjResource = findAdjResource(oldPeasant, state.getGoldLocations(), state.getTreeLocations());
         resourceDirection = oldPeasant.getPosition().getDirection(adjResource.getPosition());
-        System.out.println("Resource Direction: "+ resourceDirection.toString());
         Peasant newPeasant = new Peasant(peasantID, oldPeasant.getPosition(), adjResource.getResourceType());
 
         List<ResourceLocation> newGoldLocations = new ArrayList<>(state.getGoldLocations());
