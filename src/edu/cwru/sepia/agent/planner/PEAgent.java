@@ -176,7 +176,11 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
-//        System.out.println("\n\n\n=====MIDDLE STEP======");
+        if (getCurrentGameState(stateView).isGoal()) {
+            return actionMap;
+        }
+
+        System.out.println("\n\n\n=====MIDDLE STEP======");
 
         List<BirthLog> logs = historyView.getBirthLogs(stateView.getTurnNumber()-1);
         if (logs.size() > 0) {
@@ -185,6 +189,7 @@ public class PEAgent extends Agent {
         }
 
         for (Integer peasantID : peasantActionMap.keySet()) {
+
             Stack<StripsAction> actionStack = peasantActionMap.get(peasantID);
             if (isPeasantActivatedMap.get(peasantID) && isActionComplete(previousActionMap.get(peasantID), stateView, historyView)) {
                 // There is a one turn gap where the new unit doesn't show up.
@@ -197,18 +202,17 @@ public class PEAgent extends Agent {
                     stripsAction = actionStack.pop();
                 } catch (EmptyStackException e) {
                     // once peasants are done, make them go away
-                    actionStack.push(getFinalPeasantAction(peasantID, stateView));
-                    continue;
+                    stripsAction = getFinalPeasantAction(peasantID, stateView);
                 }
 
                 if (stripsAction instanceof BuildPeasantAction && !stripsAction.preconditionsMet(getCurrentGameState(stateView))) {
-//                    System.out.println(stripsAction + " cannot be done right now!");
+                    System.out.println(stripsAction + " cannot be done right now!");
                     StripsAction buildPeasantAction = stripsAction;
                     stripsAction = actionStack.pop();
                     actionStack.push(buildPeasantAction);
                 }
 
-//                System.out.println("Performing " + stripsAction);
+                System.out.println("Performing " + stripsAction);
                 previousActionMap.put(findIdByAction(stripsAction), stripsAction);
                 Action action = createSepiaAction(stripsAction);
                 actionMap.put(action.getUnitId(), action);
@@ -263,7 +267,7 @@ public class PEAgent extends Agent {
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
                 int unitID = peasantIdMap.get(findIdByAction(action));
-                if (result.getAction().getUnitId() == unitID && result.getFeedback() == ActionFeedback.COMPLETED) {
+                if ((result.getAction().getUnitId() == unitID || result.getAction().getUnitId() == 0) && result.getFeedback() == ActionFeedback.COMPLETED) {
                     return true;
                 }
             }
