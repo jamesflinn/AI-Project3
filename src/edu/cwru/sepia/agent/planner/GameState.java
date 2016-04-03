@@ -301,7 +301,7 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        return (int) (this.heuristic() - o.heuristic());
+        return (int) ((this.heuristic() + this.getCost()) - (o.heuristic() + o.getCost()));
     }
 
     @Override
