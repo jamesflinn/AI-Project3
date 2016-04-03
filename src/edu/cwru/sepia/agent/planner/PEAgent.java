@@ -176,7 +176,7 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
-        System.out.println("\n\n\n=====MIDDLE STEP======");
+//        System.out.println("\n\n\n=====MIDDLE STEP======");
 
         List<BirthLog> logs = historyView.getBirthLogs(stateView.getTurnNumber()-1);
         if (logs.size() > 0) {
@@ -195,13 +195,13 @@ public class PEAgent extends Agent {
                 StripsAction stripsAction = actionStack.pop();
 
                 if (stripsAction instanceof BuildPeasantAction && !stripsAction.preconditionsMet(getCurrentGameState(stateView))) {
-                    System.out.println(stripsAction + " cannot be done right now!");
+//                    System.out.println(stripsAction + " cannot be done right now!");
                     StripsAction buildPeasantAction = stripsAction;
                     stripsAction = actionStack.pop();
                     actionStack.push(buildPeasantAction);
                 }
 
-                System.out.println("Performing " + stripsAction);
+//                System.out.println("Performing " + stripsAction);
                 previousActionMap.put(findIdByAction(stripsAction), stripsAction);
                 Action action = createSepiaAction(stripsAction);
                 actionMap.put(action.getUnitId(), action);

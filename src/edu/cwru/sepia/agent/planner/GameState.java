@@ -238,21 +238,20 @@ public class GameState implements Comparable<GameState> {
         int woodNeeded = requiredWood - currentWood;
         int tripsGold = goldNeeded/100;
         int tripsWood = woodNeeded/100;
-        int tripsLeft = tripsGold + tripsWood;
-
-        //Setting 4 as the threshold for deciding whether peasants are necessary
+        int currentPeasants = peasants.values().size();
 
         for (Peasant peasant : peasants.values()) {
             if (peasant.isCarrying() && peasant.getResourceType().equals(ResourceNode.Type.GOLD_MINE)) {
                 int distanceToTownhall= peasant.getPosition().chebyshevDistance(townhall);
                 heuristic += 2 * (distanceToTownhall * (tripsGold - 1)) + distanceToTownhall;
-                if(requiredGold/2 > currentGold){
-                    heuristic = heuristic  / 2;
+
+                // carrying gold is prioritized
+                if (currentGold < 400) {
+                    heuristic /= 2;
                 }
             } else {
                 int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.GOLD_MINE));
                 heuristic += 2 * distanceToResource * tripsGold;
-
             }
         }
 
@@ -260,8 +259,9 @@ public class GameState implements Comparable<GameState> {
             if (peasant.isCarrying() && peasant.getResourceType().equals(ResourceNode.Type.TREE)) {
                 int distanceToTownhall= peasant.getPosition().chebyshevDistance(townhall);
                 heuristic += 2 * (distanceToTownhall * (tripsWood - 1)) + distanceToTownhall;
-                if(requiredGold/2 > currentGold){
-                    heuristic = heuristic * 2;
+
+                if (currentGold < 400) {
+                    heuristic *= 2;
                 }
             } else {
                 int distanceToResource = peasant.getPosition().chebyshevDistance(findClosestResourcePosition(peasant.getPosition(), ResourceNode.Type.TREE));
@@ -269,7 +269,7 @@ public class GameState implements Comparable<GameState> {
             }
         }
 
-        heuristic /= peasants.values().size();
+        heuristic /= currentPeasants;
 
         return heuristic;
     }
