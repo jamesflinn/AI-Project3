@@ -97,10 +97,7 @@ public class PlannerAgent extends Agent {
         Queue<GameState> priorityQueue = new PriorityQueue<>();
         Set<GameState> closedList = new HashSet<>();
 
-        Map<GameState, Double> gScore = new HashMap<>();
-
         priorityQueue.add(startState);
-        gScore.put(startState, 0.0);
 
         while (!priorityQueue.isEmpty()) {
             GameState current = priorityQueue.poll();
@@ -112,7 +109,6 @@ public class PlannerAgent extends Agent {
             }
 
             for (GameState neighbor : current.generateChildren()) {
-                //System.out.println("This is the neighbor:"+neighbor.toString());
                 if (closedList.contains(neighbor)) {
                     continue;
                 }

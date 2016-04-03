@@ -192,7 +192,14 @@ public class PEAgent extends Agent {
                     continue;
                 }
 
-                StripsAction stripsAction = actionStack.pop();
+                StripsAction stripsAction;
+                try {
+                    stripsAction = actionStack.pop();
+                } catch (EmptyStackException e) {
+                    // once peasants are done, make them go away
+                    actionStack.push(getFinalPeasantAction(peasantID, stateView));
+                    continue;
+                }
 
                 if (stripsAction instanceof BuildPeasantAction && !stripsAction.preconditionsMet(getCurrentGameState(stateView))) {
 //                    System.out.println(stripsAction + " cannot be done right now!");
@@ -239,6 +246,14 @@ public class PEAgent extends Agent {
         return null;
     }
 
+    /**
+     * Given a strips action, determines if that action is complete.
+     *
+     * @param action      The strips action
+     * @param stateView   The current state view
+     * @param historyView The history view
+     * @return True if the given action is complete, false otherwise
+     */
     private boolean isActionComplete(StripsAction action, State.StateView stateView, History.HistoryView historyView) {
         if (action == null) {
             return true;
@@ -263,6 +278,10 @@ public class PEAgent extends Agent {
         return false;
     }
 
+    /**
+     * Finds the ID of the peasant who was just activated. This is found by finding how many peasants are already active.
+     * @return the id of the activated peasant
+     */
     private int getActivatedPeasantId() {
         int count = 0;
         for (boolean isActivated : isPeasantActivatedMap.values()) {
@@ -271,6 +290,47 @@ public class PEAgent extends Agent {
             }
         }
         return count;
+    }
+
+    /**
+     * Once a peasant's actions run out, this method generates a final method.
+     * If a peasant is carrying anything, it makes sure that cargo is deposited at the townhall.
+     * Otherwise, it is moved to the corner of the map so that it won't get in the way of any other peasants.
+     *
+     * @param peasantID The peasant's id who needs a final action
+     * @param stateView the current state view
+     * @return The generated strips action
+     */
+    private StripsAction getFinalPeasantAction(int peasantID, State.StateView stateView) {
+        GameState currentGameState = getCurrentGameState(stateView);
+        Unit.UnitView peasant = stateView.getUnit(peasantIdMap.get(peasantID));
+        Position currentPosition = new Position(peasant.getXPosition(), peasant.getYPosition());
+        Position destination = null;
+
+        if (peasant.getCargoAmount() > 0) {
+            DepositAction depositAction = new DepositAction(peasantID);
+            if (depositAction.preconditionsMet(currentGameState)) {
+                System.out.println("Creating final deposit!");
+                depositAction.apply(currentGameState);
+                return depositAction;
+            } else {
+                // Peasant isn't next to townhall, must move him there
+                destination = new Position(currentGameState.getTownhall().x - 1, currentGameState.getTownhall().y);
+            }
+        }
+
+        if (destination == null) {
+            destination = new Position(0, 0);
+        }
+
+        MoveAction moveAction = new MoveAction(peasantID, currentPosition, destination, stateView.getXExtent(), stateView.getYExtent());
+        if (moveAction.preconditionsMet(currentGameState)) {
+            moveAction.apply(currentGameState);
+            return moveAction;
+        } else {
+            System.out.println("ERROR CREATING FINAL ACTION");
+            return null;
+        }
     }
 
     /**
