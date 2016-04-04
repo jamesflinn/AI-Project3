@@ -283,13 +283,23 @@ public class GameState implements Comparable<GameState> {
      */
     public double getCost() {
         StripsAction previousAction = previousActions.peek();
+        double cost = 1;
 
-        if (previousAction instanceof MoveAction) {
-            MoveAction moveAction = (MoveAction) previousAction;
-            return moveAction.getCurrentPosition().chebyshevDistance(moveAction.getTargetPosition());
-        } else {
-            return 1;
+        if (previousAction instanceof ParallelAction) {
+            ParallelAction parallelAction = (ParallelAction) previousAction;
+
+            for (StripsAction action : parallelAction.getActions()) {
+                // heavily emphisize harvesting gold
+                if (action instanceof HarvestAction) {
+                    HarvestAction harvestAction = (HarvestAction) action;
+                    if (peasants.get(harvestAction.getPeasantID()).getResourceType().equals(ResourceNode.Type.GOLD_MINE)) {
+                        cost -= 1000;
+                    }
+                }
+            }
         }
+
+        return cost;
     }
 
     /**
@@ -301,7 +311,13 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        return (int) ((this.heuristic() + this.getCost()) - (o.heuristic() + o.getCost()));
+        if (this.heuristic() + this.getCost() > o.heuristic() + o.getCost()) {
+            return 1;
+        } else if (this.heuristic() + this.getCost() < o.heuristic() + o.getCost()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
     @Override
