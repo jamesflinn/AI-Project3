@@ -147,7 +147,6 @@ public class GameState implements Comparable<GameState> {
      * @return true if the goal conditions are met in this instance of game state.
      */
     public boolean isGoal() {
-
         return currentGold >= requiredGold && currentWood >= requiredWood;
     }
 
@@ -279,24 +278,6 @@ public class GameState implements Comparable<GameState> {
     }
 
     /**
-     *
-     * Write the function that computes the current cost to get to this node. This is combined with your heuristic to
-     * determine which actions/states are better to explore.
-     *
-     * @return The current cost to reach this goal
-     */
-    public double getCost() {
-        StripsAction previousAction = previousActions.peek();
-
-        if (previousAction instanceof MoveAction) {
-            MoveAction moveAction = (MoveAction) previousAction;
-            return moveAction.getCurrentPosition().chebyshevDistance(moveAction.getTargetPosition());
-        } else {
-            return 1;
-        }
-    }
-
-    /**
      * This is necessary to use your state in the Java priority queue. See the official priority queue and Comparable
      * interface documentation to learn how this function should work.
      *
@@ -305,7 +286,13 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        return (int) (this.heuristic() - o.heuristic());
+        if (this.heuristic() > o.heuristic()) {
+            return 1;
+        } else if (this.heuristic() < o.heuristic()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
     @Override

@@ -176,11 +176,6 @@ public class PEAgent extends Agent {
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         Map<Integer, Action> actionMap = new HashMap<>();
 
-        if (getCurrentGameState(stateView).isGoal()) {
-            return actionMap;
-        }
-
-
         List<BirthLog> logs = historyView.getBirthLogs(stateView.getTurnNumber()-1);
         if (logs.size() > 0) {
             BirthLog log = logs.get(logs.size() - 1);
@@ -206,6 +201,13 @@ public class PEAgent extends Agent {
 
                 if (stripsAction instanceof BuildPeasantAction && !stripsAction.preconditionsMet(getCurrentGameState(stateView))) {
                     System.out.println(stripsAction + " cannot be done right now!");
+
+                    if (actionStack.size() == 1) {
+                        actionStack.push(stripsAction);
+                        continue;
+                    }
+
+
                     StripsAction buildPeasantAction = stripsAction;
                     stripsAction = actionStack.pop();
                     actionStack.push(buildPeasantAction);
