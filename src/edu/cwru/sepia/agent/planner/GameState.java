@@ -210,14 +210,18 @@ public class GameState implements Comparable<GameState> {
 
             // Add all of this peasant's actions to the list of all peasant's actions.
             allPeasantActions.add(peasantActions);
+
+
         }
 
         List<List<StripsAction>> combinedActions = cartesianProduct(allPeasantActions);
-
         for (List<StripsAction> combinedAction : combinedActions) {
             ParallelAction parallelAction = new ParallelAction(combinedAction);
             if (parallelAction.preconditionsMet(this)) {
                 children.add(parallelAction.apply(this));
+                if(Objects.equals(parallelAction.getActions().toString(), "[HarvestAction{peasantID=1, resourceDirection=NORTHEAST}, MoveAction{peasantID=2, currentPosition=(7, 10), targetPosition=(16, 10)}, DepositAction{peasantID=3, townhallDirection=SOUTHWEST}]")){
+                    System.out.println("Check here");
+                }
             }
         }
 
