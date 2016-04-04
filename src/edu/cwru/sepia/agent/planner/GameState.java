@@ -274,34 +274,6 @@ public class GameState implements Comparable<GameState> {
     }
 
     /**
-     *
-     * Write the function that computes the current cost to get to this node. This is combined with your heuristic to
-     * determine which actions/states are better to explore.
-     *
-     * @return The current cost to reach this goal
-     */
-    public double getCost() {
-        StripsAction previousAction = previousActions.peek();
-        double cost = 1;
-
-        if (previousAction instanceof ParallelAction) {
-            ParallelAction parallelAction = (ParallelAction) previousAction;
-
-            for (StripsAction action : parallelAction.getActions()) {
-                // heavily emphisize harvesting gold
-                if (action instanceof HarvestAction) {
-                    HarvestAction harvestAction = (HarvestAction) action;
-                    if (peasants.get(harvestAction.getPeasantID()).getResourceType().equals(ResourceNode.Type.GOLD_MINE)) {
-                        cost -= 1000;
-                    }
-                }
-            }
-        }
-
-        return cost;
-    }
-
-    /**
      * This is necessary to use your state in the Java priority queue. See the official priority queue and Comparable
      * interface documentation to learn how this function should work.
      *
@@ -310,9 +282,9 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        if (this.heuristic() + this.getCost() > o.heuristic() + o.getCost()) {
+        if (this.heuristic() > o.heuristic()) {
             return 1;
-        } else if (this.heuristic() + this.getCost() < o.heuristic() + o.getCost()) {
+        } else if (this.heuristic() < o.heuristic()) {
             return -1;
         } else {
             return 0;
