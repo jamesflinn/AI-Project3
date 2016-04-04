@@ -147,7 +147,6 @@ public class GameState implements Comparable<GameState> {
      * @return true if the goal conditions are met in this instance of game state.
      */
     public boolean isGoal() {
-
         return currentGold >= requiredGold && currentWood >= requiredWood;
     }
 
