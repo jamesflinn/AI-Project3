@@ -231,7 +231,8 @@ public class GameState implements Comparable<GameState> {
      * Write your heuristic function here. Remember this must be admissible for the properties of A* to hold. If you
      * can come up with an easy way of computing a consistent heuristic that is even better, but not strictly necessary.
      *
-     * Add a description here in your submission explaining your heuristic.
+     * The heuristic favors states where there are more peasants by dividing the state by 2. The heuristic also favors states where the peasant is harvesting gold by dividing the number of gold trips left from the heuristic.
+     * Once the heuristic checks for whether the peasant is carrying or not, it calculates the chebychev distance from the current position to the next position and returns the minimum distance
      *
      * @return The value estimated remaining cost to reach a goal state from this state.
      */
